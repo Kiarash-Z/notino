@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
 import { Header } from '../common/Header';
-import Icon from '../../icons/Icon';
+import { Navigation } from '../common'
 
 class Categories extends Component {
   static navigatorStyle = {
@@ -10,6 +10,7 @@ class Categories extends Component {
   render() {
     return (
         <View>
+          <Navigation/>
           <Header />
         </View>
     );
