@@ -1,14 +1,15 @@
-import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { Navigation } from 'react-native-navigation';
+import Categories from './components/pages/Categories';
 
-class App extends Component {
-  render() {
-    return (
-      <View>
-        <Text>Je</Text>
-      </View>
-    );
-  }
-}
-
-export default App;
+export default () => {
+  Navigation.registerComponent('Categories', () => Categories);
+  Navigation.startSingleScreenApp({
+    screen: {
+      screen: 'Categories',
+      navigatorStyle: {},
+      navigatorButtons: {}
+    },
+    passProps: {},
+    animationType: 'slide-down'
+  });
+};
