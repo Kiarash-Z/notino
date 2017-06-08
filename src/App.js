@@ -7,6 +7,7 @@ export default () => {
     screen: {
       screen: 'Categories',
       navigatorStyle: {},
+      title:'search',
       navigatorButtons: {}
     },
     passProps: {},
