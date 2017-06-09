@@ -1,13 +1,12 @@
 import { Navigation } from 'react-native-navigation';
-import Categories from './components/pages/Categories';
+import Category from './components/pages/Category';
 
 export default () => {
-  Navigation.registerComponent('Categories', () => Categories);
+  Navigation.registerComponent('Category', () => Category);
   Navigation.startSingleScreenApp({
     screen: {
-      screen: 'Categories',
+      screen: 'Category',
       navigatorStyle: {},
-      title:'search',
       navigatorButtons: {}
     },
     passProps: {},

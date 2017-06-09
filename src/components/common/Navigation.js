@@ -39,7 +39,7 @@ const styles = {
   },
   searchTextStyle: {
     fontSize: 15,
-    marginLeft:5,
+    marginLeft: 5,
     color: '#a8b5bd'
   }
 };

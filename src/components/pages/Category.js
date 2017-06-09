@@ -1,20 +1,20 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
-import { Header } from '../common/Header';
-import { Navigation } from '../common'
+import Header from '../Header';
+import { Navigation } from '../common';
 
-class Categories extends Component {
+class Category extends Component {
   static navigatorStyle = {
       navBarHidden: true
   };
   render() {
     return (
-        <View>
-          <Navigation/>
+        <View style={{ backgroundColor: 'white' }}>
+          <Navigation />
           <Header />
         </View>
     );
   }
 }
 
-export default Categories;
+export default Category;
