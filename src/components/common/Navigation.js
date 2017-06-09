@@ -43,8 +43,8 @@ const styles = {
     alignItems: 'center'
   },
   rightInfoTextStyle: {
-    fontSize: 14,
-    marginRight: 5,
+    fontSize: 16,
+    marginRight: 10,
     color: '#234960',
     fontFamily: 'IS_Reg'
   },

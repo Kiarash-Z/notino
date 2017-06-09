@@ -9,6 +9,20 @@ class Category extends Component {
   static navigatorStyle = {
       navBarHidden: true
   };
+  constructor(props) {
+    super(props);
+    this.categoriesNavigate = this.categoriesNavigate.bind(this);
+  }
+  // navigates to categories page
+  categoriesNavigate() {
+    this.props.navigator.push({
+      screen: 'Categories',
+      navigatorStyle: {
+        navBarHidden: true,
+        screenBackgroundColor: 'white'
+      }
+    });
+  }
   render() {
     return (
         <View style={{ flex: 1 }}>
@@ -17,6 +31,7 @@ class Category extends Component {
           <Navigation
             rightIcon='category'
             leftIcon='menu'
+            onRightButtonPress={this.categoriesNavigate}
           >
             <Icon name="search" size={14} color="#a8b5bd" />
             <Text style={styles.searchTextStyle}>جستجو بر اساس تیتر و هشتگ</Text>
