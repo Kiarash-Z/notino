@@ -1,21 +1,23 @@
 import React from 'react';
 import { TextInput } from 'react-native';
 
-const Input = (props) => {
+const Input = ({ placeholder, value, flex, size, align, onChangeText }) => {
   return (
     <TextInput
-      style={[styles.titleStyle, { fontSize: props.size, textAlign: props.align }]}
+      style={[styles.inputStyle, { fontSize: size, textAlign: align }]}
       underlineColorAndroid="transparent"
-      placeholder={props.placeholder}
+      value={value}
+      onChangeText={onChangeText}
+      placeholder={placeholder}
     />
   );
 };
 
 const styles = {
   inputStyle: {
-    fontSize: 15,
     textAlign: 'left',
-    fontFamily: 'IS_Med'
+    fontFamily: 'IS_Med',
+    fontSize: 25
   }
 };
 

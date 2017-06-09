@@ -12,8 +12,20 @@ class Category extends Component {
   render() {
     return (
         <View style={{ flex: 1 }}>
-          <Navigation />
+          {/* Navigation */}
+
+          <Navigation
+            rightIcon='category'
+            leftIcon='menu'
+          >
+            <Icon name="search" size={14} color="#a8b5bd" />
+            <Text style={styles.searchTextStyle}>جستجو بر اساس تیتر و هشتگ</Text>
+          </Navigation>
+          {/* Header */}
+
           <Header />
+          {/* Items */}
+
           <ListItem icons={['alarm', 'motalee']} title="باشگاه">
             <Text>اطلاعاتی در مورد باشگاه</Text>
           </ListItem>
@@ -28,5 +40,13 @@ class Category extends Component {
     );
   }
 }
+
+const styles = {
+  searchTextStyle: {
+    fontSize: 15,
+    color: '#a8b5bd',
+    marginLeft: 5
+  }
+};
 
 export default Category;

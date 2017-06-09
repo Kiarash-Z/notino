@@ -4,15 +4,20 @@ import { Icon } from './index';
 
 class Navigation extends Component {
   render() {
-    const { containerStyle, searchContainerStyle, searchTextStyle } = styles;
+    const { containerStyle, searchContainerStyle, infoStyle, rightInfoTextStyle } = styles;
+    const { onLeftButtonPress, onRightButtonPress, rightIcon, leftIcon, children, rightInfo } = this.props;
     return (
       <View style={containerStyle}>
-        <Icon name="menu" size={25} />
-        <View style={searchContainerStyle}>
-          <Icon name="search" size={14} color="#a8b5bd" />
-          <Text style={searchTextStyle}>جستجو بر اساس تیتر و هشتگ</Text>
+        <View style={infoStyle}>
+          <Icon name={leftIcon} size={25} onPress={onLeftButtonPress} color="#234960" />
         </View>
-        <Icon name="category" size={25} color="#a8b5bd" />
+        <View style={searchContainerStyle}>
+          {children}
+        </View>
+        <View style={infoStyle}>
+          <Text style={rightInfoTextStyle}>{rightInfo}</Text>
+          <Icon onPress={onRightButtonPress} name={rightIcon} size={25} color="#234960" />
+        </View>
       </View>
     );
   }
@@ -33,14 +38,19 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-between'
   },
+  infoStyle: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  rightInfoTextStyle: {
+    fontSize: 14,
+    marginRight: 5,
+    color: '#234960',
+    fontFamily: 'IS_Reg'
+  },
   searchContainerStyle: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  searchTextStyle: {
-    fontSize: 15,
-    marginLeft: 5,
-    color: '#a8b5bd'
   }
 };
 
