@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 import Header from '../Header';
 import { Navigation } from '../common';
+import ListItem from '../ListItem';
 
 class Category extends Component {
   static navigatorStyle = {
@@ -9,9 +10,18 @@ class Category extends Component {
   };
   render() {
     return (
-        <View style={{ backgroundColor: 'white' }}>
+        <View>
           <Navigation />
           <Header />
+          <ListItem icons={['alarm', 'motalee']} title="باشگاه">
+            <Text>اطلاعاتی در مورد باشگاه</Text>
+          </ListItem>
+          <ListItem icons={['alarm', 'motalee']} title="باشگاه">
+            <Text>اطلاعاتی در مورد باشگاه</Text>
+          </ListItem>
+          <ListItem icons={['alarm', 'motalee']} title="باشگاه">
+            <Text>اطلاعاتی در مورد باشگاه</Text>
+          </ListItem>
         </View>
     );
   }

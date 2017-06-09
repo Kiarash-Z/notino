@@ -6,7 +6,9 @@ export default () => {
   Navigation.startSingleScreenApp({
     screen: {
       screen: 'Category',
-      navigatorStyle: {},
+      navigatorStyle: {
+        screenBackgroundColor: 'white'
+      },
       navigatorButtons: {}
     },
     passProps: {},
