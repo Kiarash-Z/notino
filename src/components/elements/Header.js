@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text } from 'react-native';
-import { Icon } from './common';
+import { Icon } from '../common';
 
 class Header extends Component {
   render() {
@@ -21,7 +21,7 @@ const styles = {
   containerStyle: {
     paddingTop: 35,
     paddingBottom: 35,
-  },  
+  },
   titleContainerStyle: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -34,8 +34,8 @@ const styles = {
   },
   titleStyle: {
     fontSize: 40,
-    color: 'rgba(0,0,0, .5)',
-    fontFamily: 'IS_Med'
+    color: 'rgba(0,0,0, .8)',
+    fontFamily: 'IS_Reg'
   }
 };
 

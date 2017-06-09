@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
 import { Navigation } from '../common/Navigation';
-import CategoriesItem from '../CategoriesItem';
+import CategoriesItem from '../elements/CategoriesItem';
 
 class Categories extends Component {
   constructor(props) {
@@ -13,7 +13,8 @@ class Categories extends Component {
     this.props.navigator.push({
       screen: 'Category',
       navigatorStyle: {
-        navBarHidden: true
+        navBarHidden: true,
+        screenBackgroundColor: 'white'
       }
     });
   }

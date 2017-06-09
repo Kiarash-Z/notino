@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { View, Text } from 'react-native';
 import ActionButton from 'react-native-action-button';
-import Header from '../Header';
+import Header from '../elements/Header';
 import { Navigation, Icon } from '../common';
-import ListItem from '../ListItem';
+import ListItem from '../elements/ListItem';
 
 class Category extends Component {
   static navigatorStyle = {
@@ -24,6 +24,7 @@ class Category extends Component {
     });
   }
   render() {
+    const { searchTextStyle, moreInfoTextStyle } = styles;
     return (
         <View style={{ flex: 1 }}>
           {/* Navigation */}
@@ -34,7 +35,7 @@ class Category extends Component {
             onRightButtonPress={this.categoriesNavigate}
           >
             <Icon name="search" size={14} color="#a8b5bd" />
-            <Text style={styles.searchTextStyle}>جستجو بر اساس تیتر و هشتگ</Text>
+            <Text style={searchTextStyle}>جستجو بر اساس تیتر و هشتگ</Text>
           </Navigation>
           {/* Header */}
 
@@ -42,13 +43,13 @@ class Category extends Component {
           {/* Items */}
 
           <ListItem icons={['alarm', 'motalee']} title="باشگاه">
-            <Text>اطلاعاتی در مورد باشگاه</Text>
+            <Text style={moreInfoTextStyle}>اطلاعاتی در مورد باشگاه</Text>
           </ListItem>
           <ListItem icons={['alarm', 'motalee']} title="باشگاه">
-            <Text>اطلاعاتی در مورد باشگاه</Text>
+            <Text style={moreInfoTextStyle}>اطلاعاتی در مورد باشگاه</Text>
           </ListItem>
           <ListItem icons={['alarm', 'motalee']} title="باشگاه">
-            <Text>اطلاعاتی در مورد باشگاه</Text>
+            <Text style={moreInfoTextStyle}>اطلاعاتی در مورد باشگاه</Text>
           </ListItem>
           <ActionButton buttonColor="#218ffe" />
         </View>
@@ -58,9 +59,15 @@ class Category extends Component {
 
 const styles = {
   searchTextStyle: {
-    fontSize: 15,
+    fontFamily: 'IS_Light',
+    fontSize: 14,
     color: '#a8b5bd',
     marginLeft: 5
+  },
+  moreInfoTextStyle: {
+    fontSize: 15,
+    color: '#a8b5bd',
+    fontFamily: 'IS_Light'
   }
 };
 
