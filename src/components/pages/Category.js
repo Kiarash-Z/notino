@@ -12,11 +12,22 @@ class Category extends Component {
   constructor(props) {
     super(props);
     this.categoriesNavigate = this.categoriesNavigate.bind(this);
+    this.itemCreateNavigate = this.itemCreateNavigate.bind(this);
   }
-  // navigates to categories page
+  // navigates to categories' page
   categoriesNavigate() {
     this.props.navigator.push({
       screen: 'Categories',
+      navigatorStyle: {
+        navBarHidden: true,
+        screenBackgroundColor: 'white'
+      }
+    });
+  }
+  // navigates to ItemCreate page
+  itemCreateNavigate() {
+    this.props.navigator.push({
+      screen: 'ItemCreate',
       navigatorStyle: {
         navBarHidden: true,
         screenBackgroundColor: 'white'
@@ -51,12 +62,7 @@ class Category extends Component {
               <Text style={moreInfoTextStyle}>اطلاعاتی در مورد باشگاه</Text>
             </ListItem>
           </ItemSection>
-          <ItemSection>
-            <ListItem icons={['alarm', 'motalee']} title="باشگاه">
-              <Text style={moreInfoTextStyle}>اطلاعاتی در مورد باشگاه</Text>
-            </ListItem>
-          </ItemSection>
-          <ActionButton buttonColor="#218ffe" />
+          <ActionButton onPress={this.itemCreateNavigate} buttonColor="#218ffe" />
         </View>
     );
   }

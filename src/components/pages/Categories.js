@@ -8,7 +8,7 @@ class Categories extends Component {
     super(props);
     this.categoryNavigate = this.categoryNavigate.bind(this);
   }
-  // this will navigate back to category page
+  // this will navigate back to category's page
   categoryNavigate() {
     this.props.navigator.push({
       screen: 'Category',
