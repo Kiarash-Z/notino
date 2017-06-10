@@ -1,6 +1,6 @@
-import { createIconSetFromFontello } from 'react-native-vector-icons';
+import { createIconSetFromIcoMoon } from 'react-native-vector-icons';
 import config from '../../config.json';
 
-const Icon = createIconSetFromFontello(config);
+const Icon = createIconSetFromIcoMoon(config);
 
 export { Icon };

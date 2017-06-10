@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
 import { Navigation, Input, ItemSection } from '../common';
+import ItemAddons from '../elements/ItemAddons';
 
 class ItemCreate extends Component {
   constructor(props) {
@@ -20,7 +21,7 @@ class ItemCreate extends Component {
   render() {
     const { inputContainerStyle, sectionStyle } = styles;
     return (
-      <View>
+      <View style={{ flex: 1 }}>
         <Navigation
           rightInfo="ذخیره"
           rightInfoColor="#0288eb"
@@ -52,6 +53,7 @@ class ItemCreate extends Component {
             />
           </ItemSection>
 
+
           <ItemSection style={sectionStyle}>
             <Input
               placeholder="لینک"
@@ -60,14 +62,20 @@ class ItemCreate extends Component {
             />
           </ItemSection>
         </View>
-
+        <ItemAddons />
       </View>
     );
   }
 }
 const styles = {
   inputContainerStyle: {
-    paddingRight: 10
+    paddingRight: 10,
+    flex: 0.92,
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    elevation: 0.5
   },
   sectionStyle: {
     paddingTop: 4,
