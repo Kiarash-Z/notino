@@ -5,7 +5,14 @@ import { Icon } from './index';
 class Navigation extends Component {
   render() {
     const { containerStyle, searchContainerStyle, infoStyle, rightInfoTextStyle } = styles;
-    const { onLeftButtonPress, onRightButtonPress, rightIcon, leftIcon, children, rightInfo } = this.props;
+    const { onLeftButtonPress,
+            onRightButtonPress,
+            rightIcon,
+            leftIcon,
+            children,
+            rightInfo,
+            rightInfoColor = '#234960'
+          } = this.props;
     return (
       <View style={containerStyle}>
         <View style={infoStyle}>
@@ -15,7 +22,7 @@ class Navigation extends Component {
           {children}
         </View>
         <View style={infoStyle}>
-          <Text style={rightInfoTextStyle}>{rightInfo}</Text>
+          <Text style={[rightInfoTextStyle, { color: rightInfoColor }]}>{rightInfo}</Text>
           <Icon onPress={onRightButtonPress} name={rightIcon} size={25} color="#234960" />
         </View>
       </View>

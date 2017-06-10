@@ -1,7 +1,7 @@
 import React from 'react';
 import { TextInput } from 'react-native';
 
-const Input = ({ placeholder, value, flex, size, align, onChangeText }) => {
+const Input = ({ placeholder, value, size, align, onChangeText }) => {
   return (
     <TextInput
       style={[styles.inputStyle, { fontSize: size, textAlign: align }]}
@@ -9,6 +9,7 @@ const Input = ({ placeholder, value, flex, size, align, onChangeText }) => {
       value={value}
       onChangeText={onChangeText}
       placeholder={placeholder}
+      placeholderTextColor='rgba(0,0,0,.3)'
     />
   );
 };
@@ -16,7 +17,7 @@ const Input = ({ placeholder, value, flex, size, align, onChangeText }) => {
 const styles = {
   inputStyle: {
     textAlign: 'left',
-    fontFamily: 'IS_Med',
+    fontFamily: 'IS_Light',
     fontSize: 25
   }
 };

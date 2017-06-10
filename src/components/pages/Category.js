@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View, Text } from 'react-native';
 import ActionButton from 'react-native-action-button';
 import Header from '../elements/Header';
-import { Navigation, Icon } from '../common';
+import { Navigation, Icon, ItemSection } from '../common';
 import ListItem from '../elements/ListItem';
 
 class Category extends Component {
@@ -41,16 +41,21 @@ class Category extends Component {
 
           <Header />
           {/* Items */}
-
-          <ListItem icons={['alarm', 'motalee']} title="باشگاه">
-            <Text style={moreInfoTextStyle}>اطلاعاتی در مورد باشگاه</Text>
-          </ListItem>
-          <ListItem icons={['alarm', 'motalee']} title="باشگاه">
-            <Text style={moreInfoTextStyle}>اطلاعاتی در مورد باشگاه</Text>
-          </ListItem>
-          <ListItem icons={['alarm', 'motalee']} title="باشگاه">
-            <Text style={moreInfoTextStyle}>اطلاعاتی در مورد باشگاه</Text>
-          </ListItem>
+          <ItemSection>
+            <ListItem icons={['alarm', 'motalee']} title="باشگاه">
+              <Text style={moreInfoTextStyle}>اطلاعاتی در مورد باشگاه</Text>
+            </ListItem>
+          </ItemSection>
+          <ItemSection>
+            <ListItem icons={['alarm', 'motalee']} title="باشگاه">
+              <Text style={moreInfoTextStyle}>اطلاعاتی در مورد باشگاه</Text>
+            </ListItem>
+          </ItemSection>
+          <ItemSection>
+            <ListItem icons={['alarm', 'motalee']} title="باشگاه">
+              <Text style={moreInfoTextStyle}>اطلاعاتی در مورد باشگاه</Text>
+            </ListItem>
+          </ItemSection>
           <ActionButton buttonColor="#218ffe" />
         </View>
     );

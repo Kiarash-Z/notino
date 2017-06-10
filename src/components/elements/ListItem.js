@@ -5,8 +5,7 @@ import { Icon } from '../common';
 class ListItem extends Component {
   render() {
     const { title, children, icons } = this.props;
-    const { containerStyle,
-            rowContainerStyle,
+    const { rowContainerStyle,
             titleTextStyle,
             iconContainerStyle,
             titleContainerStyle,
@@ -22,7 +21,7 @@ class ListItem extends Component {
       });
     };
     return (
-      <View style={containerStyle}>
+      <View>
         <View style={rowContainerStyle}>
           <View style={iconContainerStyle}>
             {renderIcons()}
@@ -41,14 +40,6 @@ class ListItem extends Component {
 }
 
 const styles = {
-  containerStyle: {
-    borderTopWidth: 1,
-    borderColor: 'rgba(0,0,0,.1)',
-    paddingTop: 15,
-    paddingBottom: 15,
-    paddingLeft: 10,
-    paddingRight: 10
-  },
   rowContainerStyle: {
     flexDirection: 'row',
     justifyContent: 'space-between',
