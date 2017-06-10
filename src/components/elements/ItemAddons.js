@@ -1,9 +1,22 @@
 import React, { Component } from 'react';
-import { View } from 'react-native';
+import { View, CameraRoll } from 'react-native';
 
 import { Icon } from '../common';
 
 class ItemAddons extends Component {
+    constructor(props) {
+      super(props);
+      this.addImage = this.addImage.bind(this);
+    }
+    addImage() {
+      CameraRoll.getPhotos({
+        first: 25,
+        assetType: 'All'
+      })
+      .then(r => {
+        this.props.addImage(r.edges);
+      });
+    }
     render() {
       const { containerStyle, circleStyle } = styles;
       return (
@@ -15,7 +28,7 @@ class ItemAddons extends Component {
             <Icon name="alarm" size={21} color="#7b75f9" />
           </View>
 
-          <Icon name="link" size={21} color="#7b75f9" />
+          <Icon onPress={this.addImage} name="link" size={21} color="#7b75f9" />
         </View>
       );
     }
@@ -23,11 +36,14 @@ class ItemAddons extends Component {
 
 const styles = {
   containerStyle: {
-    flex: 0.08,
+    paddingTop: 15,
+    paddingBottom: 15,
     flexDirection: 'row',
     backgroundColor: 'white',
     justifyContent: 'space-around',
-    alignItems: 'center'
+    alignItems: 'center',
+    borderTopWidth: 0.8,
+    borderTopColor: 'rgba(0,0,0,.08)'
   },
   circleStyle: {
     backgroundColor: '#e02420',
