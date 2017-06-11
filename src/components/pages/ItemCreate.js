@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import { View, Image, TouchableHighlight, FlatList, ScrollView, Picker } from 'react-native';
+import { Actions } from 'react-native-router-flux';
 import { Navigation, Input, ItemSection } from '../common';
 import ItemAddons from '../elements/ItemAddons';
+
+var ImagePicker = require('react-native-image-picker');
 
 class ItemCreate extends Component {
   constructor(props) {
@@ -9,27 +12,40 @@ class ItemCreate extends Component {
     this.state = {
       images: [],
       selectedImages: [],
+      avatarSource: ' ',
       showImagesModal: false,
       selectedInput: 'ورزشی'
     };
-    this.categoryNavigate = this.categoryNavigate.bind(this);
     this.handleAddImage = this.handleAddImage.bind(this);
     this.renderImages = this.renderImages.bind(this);
     this.renderSelectedImages = this.renderSelectedImages.bind(this);
+    this.test = this.test.bind(this);
   }
-  // this will navigate back to category's page
 
-  categoryNavigate() {
-    this.props.navigator.push({
-      screen: 'Category',
-      navigatorStyle: {
-        navBarHidden: true,
-        screenBackgroundColor: 'white'
-      }
+  // this will show up images section on icon press
+  test() {
+    console.log('hello?');
+    ImagePicker.showImagePicker(null, (response) => {
+  console.log('Response = ', response);
+
+  if (response.didCancel) {
+    console.log('User cancelled image picker');
+  } else if (response.error) {
+    console.log('ImagePicker Error: ', response.error);
+  } else if (response.customButton) {
+    console.log('User tapped custom button: ', response.customButton);
+  } else {
+    const source = { uri: response.uri };
+
+    // You can also display the image using data:
+    // let source = { uri: 'data:image/jpeg;base64,' + response.data };
+
+    this.setState({
+      avatarSource: source
     });
   }
-  // this will show up images section on icon press
-
+});
+  }
   handleAddImage(images) {
     this.setState({
       images,
@@ -67,10 +83,14 @@ class ItemCreate extends Component {
 
   renderSelectedImages({ item }) {
     return (
-      <Image
-        style={styles.imageStyle}
-        source={{ uri: item.node.image.uri }}
-      />
+      <TouchableHighlight onPress={this.test}>
+
+        <Image
+          style={styles.imageStyle}
+          source={{ uri: item.node.image.uri }}
+
+        />
+      </TouchableHighlight>
     );
   }
   render() {
@@ -93,8 +113,9 @@ class ItemCreate extends Component {
           rightInfo="ذخیره"
           rightInfoColor="#0288eb"
           leftIcon="back"
-          onLeftButtonPress={this.categoryNavigate}
+          onLeftButtonPress={() => Actions.category()}
         />
+        <Image source={{ uri: this.state.avatarSource }} />
         <ScrollView>
           <View style={{ paddingRight: 10 }}>
             <ItemSection style={{ ...sectionStyle, borderTopWidth: 0 }}>

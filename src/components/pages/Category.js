@@ -1,39 +1,12 @@
 import React, { Component } from 'react';
 import { View, Text } from 'react-native';
+import { Actions } from 'react-native-router-flux';
 import ActionButton from 'react-native-action-button';
 import Header from '../elements/Header';
 import { Navigation, Icon, ItemSection } from '../common';
 import ListItem from '../elements/ListItem';
 
 class Category extends Component {
-  static navigatorStyle = {
-      navBarHidden: true
-  };
-  constructor(props) {
-    super(props);
-    this.categoriesNavigate = this.categoriesNavigate.bind(this);
-    this.itemCreateNavigate = this.itemCreateNavigate.bind(this);
-  }
-  // navigates to categories' page
-  categoriesNavigate() {
-    this.props.navigator.push({
-      screen: 'Categories',
-      navigatorStyle: {
-        navBarHidden: true,
-        screenBackgroundColor: 'white'
-      }
-    });
-  }
-  // navigates to ItemCreate page
-  itemCreateNavigate() {
-    this.props.navigator.push({
-      screen: 'ItemCreate',
-      navigatorStyle: {
-        navBarHidden: true,
-        screenBackgroundColor: 'white'
-      }
-    });
-  }
   render() {
     const { searchTextStyle, moreInfoTextStyle } = styles;
     return (
@@ -43,7 +16,7 @@ class Category extends Component {
           <Navigation
             rightIcon='category'
             leftIcon='menu'
-            onRightButtonPress={this.categoriesNavigate}
+            onRightButtonPress={() => Actions.categories()}
           >
             <Icon name="search" size={14} color="#a8b5bd" />
             <Text style={searchTextStyle}>جستجو بر اساس تیتر و هشتگ</Text>
@@ -62,7 +35,7 @@ class Category extends Component {
               <Text style={moreInfoTextStyle}>اطلاعاتی در مورد باشگاه</Text>
             </ListItem>
           </ItemSection>
-          <ActionButton onPress={this.itemCreateNavigate} buttonColor="#218ffe" />
+          <ActionButton onPress={() => Actions.itemCreate()} buttonColor="#218ffe" />
         </View>
     );
   }

@@ -1,23 +1,10 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
+import { Actions } from 'react-native-router-flux';
 import { Navigation } from '../common/Navigation';
 import CategoriesItem from '../elements/CategoriesItem';
 
 class Categories extends Component {
-  constructor(props) {
-    super(props);
-    this.categoryNavigate = this.categoryNavigate.bind(this);
-  }
-  // this will navigate back to category's page
-  categoryNavigate() {
-    this.props.navigator.push({
-      screen: 'Category',
-      navigatorStyle: {
-        navBarHidden: true,
-        screenBackgroundColor: 'white'
-      }
-    });
-  }
   render() {
     const { itemsContainerStyle, columnStyle, rightColumn } = styles;
     return (
@@ -26,7 +13,7 @@ class Categories extends Component {
           rightIcon="category"
           rightInfo="دسته بندی ها"
           leftIcon="back"
-          onLeftButtonPress={this.categoryNavigate}
+          onLeftButtonPress={() => { Actions.category(); }}
         />
         <View style={itemsContainerStyle}>
           <View style={columnStyle}>

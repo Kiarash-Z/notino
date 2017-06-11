@@ -1,7 +1,14 @@
 package com.notino;
 
-import com.reactnativenavigation.controllers.SplashActivity;
+import com.imagepicker.permissions.OnImagePickerPermissionsCallback;
+import com.facebook.react.modules.core.PermissionListener;
 
-public class MainActivity extends SplashActivity {
 
+import com.facebook.react.ReactActivity;
+
+ public class MainActivity extends ReactActivity {
+    @Override
+   protected String getMainComponentName() {
+       return "notino";
+ }
 }
