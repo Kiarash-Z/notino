@@ -9,7 +9,7 @@ import { View,
 import GestureRecognizer from 'react-native-swipe-gestures';
 import ImagePicker from 'react-native-image-picker';
 import { Actions } from 'react-native-router-flux';
-import { Navigation, Input, ItemSection } from '../common';
+import { Navigation, Input, ItemSection, Icon } from '../common';
 import ItemAddons from '../elements/ItemAddons';
 
 const ImagePickerOptions = {
@@ -29,18 +29,19 @@ class ItemCreate extends Component {
       showImagesModal: false,
       selectedInput: 'ورزشی'
     };
+    // enable animation
+
+    UIManager.setLayoutAnimationEnabledExperimental &&
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+    // bindings
+
     this.handleAddImage = this.handleAddImage.bind(this);
     this.renderImages = this.renderImages.bind(this);
     this.renderSelectedImages = this.renderSelectedImages.bind(this);
     this.onSwipeUp = this.onSwipeUp.bind(this);
-    this.changeImage = this.changeImage.bind(this);
+    this.expandImage = this.expandImage.bind(this);
+    this.removeImage = this.removeImage.bind(this);
   }
-  componentWillUpdate() {
-    UIManager.setLayoutAnimationEnabledExperimental &&
-    UIManager.setLayoutAnimationEnabledExperimental(true);
-    LayoutAnimation.easeInEaseOut();
-  }
-  // this func will change existing image
   // open gallery on swipe
   onSwipeUp() {
   ImagePicker.showImagePicker(ImagePickerOptions, (response) => {
@@ -57,26 +58,28 @@ class ItemCreate extends Component {
     });
   }
   // this func will change image
-  
-  changeImage(uri) {
-    ImagePicker.showImagePicker(ImagePickerOptions, (response) => {
-      if (response.didCancel || response.error || response.customButton) {
-        return false;
-      }
+
+  expandImage(uri) {
       const selectedImages = this.state.selectedImages.map((image) => {
         if (image.node.image.uri === uri) {
-          image.node.image.uri = response.uri;
+          LayoutAnimation.spring();
+          image.expanded = !image.expanded;
         }
         return image;
       });
-      this.setState({
-        selectedImages
-      });
+      this.setState({ selectedImages });
+  }
+  // this func will remove image
+  removeImage(uri) {
+    const selectedImages = this.state.selectedImages.filter((image) => {
+      return image.node.image.uri !== uri;
     });
+    this.setState({ selectedImages });
   }
   // this will show up images section on icon press
 
   handleAddImage(images) {
+    LayoutAnimation.easeInEaseOut();
     this.setState({
       images,
       showImagesModal: !this.state.showImagesModal
@@ -96,7 +99,7 @@ class ItemCreate extends Component {
               return false;
             }
             this.setState({
-              selectedImages: [...this.state.selectedImages, item],
+              selectedImages: [...this.state.selectedImages, { ...item, expanded: false }],
               showImagesModal: false
             });
             }}
@@ -112,12 +115,24 @@ class ItemCreate extends Component {
   // this will renders user selected images
 
   renderSelectedImages({ item }) {
+    const expandedHeight = item.expanded ? 250 : 70;
+    const evaluatedOpacity = item.expanded ? 0 : 0.5;
+    const iconDisplay = item.expanded ? 'none' : 'flex';
     return (
-      <TouchableHighlight onPress={() => this.changeImage(item.node.image.uri)}>
-        <Image
-          style={styles.imageStyle}
-          source={{ uri: item.node.image.uri }}
-        />
+      <TouchableHighlight
+         onPress={() => this.expandImage(item.node.image.uri)}
+         onLongPress={() => this.removeImage(item.node.image.uri)}
+      >
+        <View style={{ position: 'relative' }}>
+          <View style={styles.filterContainerStyle}>
+            <View style={[styles.blackFilterStyle, { opacity: evaluatedOpacity }]} />
+            <Icon style={{ display: iconDisplay }}name="picture" size={27} color="white" />
+          </View>
+          <Image
+            style={[styles.imageStyle, { height: expandedHeight }]}
+            source={{ uri: item.node.image.uri }}
+          />
+        </View>
       </TouchableHighlight>
     );
   }
@@ -227,8 +242,29 @@ const styles = {
   },
   imageStyle: {
     flex: 1,
-    height: 50,
+    height: 70,
     resizeMode: 'cover'
+  },
+  filterContainerStyle: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    flex: 1,
+    height: 70,
+    top: 0,
+    right: 0,
+    left: 0,
+    zIndex: 2
+  },
+  blackFilterStyle: {
+    backgroundColor: 'black',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 70,
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 };
 export default ItemCreate;
