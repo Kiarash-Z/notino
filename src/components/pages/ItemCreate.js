@@ -1,10 +1,24 @@
 import React, { Component } from 'react';
-import { View, Image, TouchableHighlight, FlatList, ScrollView, Picker } from 'react-native';
+import { View,
+        Image,
+        TouchableHighlight,
+        FlatList, ScrollView,
+        Picker,
+         LayoutAnimation,
+        UIManager } from 'react-native';
+import GestureRecognizer from 'react-native-swipe-gestures';
+import ImagePicker from 'react-native-image-picker';
 import { Actions } from 'react-native-router-flux';
 import { Navigation, Input, ItemSection } from '../common';
 import ItemAddons from '../elements/ItemAddons';
 
-var ImagePicker = require('react-native-image-picker');
+const ImagePickerOptions = {
+  title: 'Select Image',
+  storageOptions: {
+    skipBackup: true,
+    path: 'images'
+  }
+};
 
 class ItemCreate extends Component {
   constructor(props) {
@@ -12,40 +26,56 @@ class ItemCreate extends Component {
     this.state = {
       images: [],
       selectedImages: [],
-      avatarSource: ' ',
       showImagesModal: false,
       selectedInput: 'ورزشی'
     };
     this.handleAddImage = this.handleAddImage.bind(this);
     this.renderImages = this.renderImages.bind(this);
     this.renderSelectedImages = this.renderSelectedImages.bind(this);
-    this.test = this.test.bind(this);
+    this.onSwipeUp = this.onSwipeUp.bind(this);
+    this.changeImage = this.changeImage.bind(this);
   }
-
-  // this will show up images section on icon press
-  test() {
-    console.log('hello?');
-    ImagePicker.showImagePicker(null, (response) => {
-  console.log('Response = ', response);
-
-  if (response.didCancel) {
-    console.log('User cancelled image picker');
-  } else if (response.error) {
-    console.log('ImagePicker Error: ', response.error);
-  } else if (response.customButton) {
-    console.log('User tapped custom button: ', response.customButton);
-  } else {
-    const source = { uri: response.uri };
-
-    // You can also display the image using data:
-    // let source = { uri: 'data:image/jpeg;base64,' + response.data };
-
+  componentWillUpdate() {
+    UIManager.setLayoutAnimationEnabledExperimental &&
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+    LayoutAnimation.easeInEaseOut();
+  }
+  // this func will change existing image
+  // open gallery on swipe
+  onSwipeUp() {
+  ImagePicker.showImagePicker(ImagePickerOptions, (response) => {
+    if (response.didCancel || response.error || response.customButton) {
+      return false;
+    }
     this.setState({
-      avatarSource: source
+      selectedImages: [
+              ...this.state.selectedImages,
+              { node: { image: { uri: response.uri } } }
+            ],
+          showImagesModal: false
+          });
     });
   }
-});
+  // this func will change image
+  
+  changeImage(uri) {
+    ImagePicker.showImagePicker(ImagePickerOptions, (response) => {
+      if (response.didCancel || response.error || response.customButton) {
+        return false;
+      }
+      const selectedImages = this.state.selectedImages.map((image) => {
+        if (image.node.image.uri === uri) {
+          image.node.image.uri = response.uri;
+        }
+        return image;
+      });
+      this.setState({
+        selectedImages
+      });
+    });
   }
+  // this will show up images section on icon press
+
   handleAddImage(images) {
     this.setState({
       images,
@@ -83,25 +113,27 @@ class ItemCreate extends Component {
 
   renderSelectedImages({ item }) {
     return (
-      <TouchableHighlight onPress={this.test}>
-
+      <TouchableHighlight onPress={() => this.changeImage(item.node.image.uri)}>
         <Image
           style={styles.imageStyle}
           source={{ uri: item.node.image.uri }}
-
         />
       </TouchableHighlight>
     );
   }
   render() {
     const { sectionStyle, selectingImageContainer, } = styles;
+    const swipeConfig = {
+        velocityThreshold: 0.3,
+        directionalOffsetThreshold: 80
+      };
     const showImages = () => {
       if (this.state.showImagesModal) {
         return (
           <FlatList
               data={this.state.images}
               renderItem={this.renderImages}
-              keyExtractor={item => item.node.timestamp}
+              keyExtractor={item => item.node.image.uri}
               horizontal
           />
         );
@@ -115,7 +147,6 @@ class ItemCreate extends Component {
           leftIcon="back"
           onLeftButtonPress={() => Actions.category()}
         />
-        <Image source={{ uri: this.state.avatarSource }} />
         <ScrollView>
           <View style={{ paddingRight: 10 }}>
             <ItemSection style={{ ...sectionStyle, borderTopWidth: 0 }}>
@@ -160,11 +191,16 @@ class ItemCreate extends Component {
           <FlatList
               data={this.state.selectedImages}
               renderItem={this.renderSelectedImages}
-              keyExtractor={item => item.node.timestamp}
+              keyExtractor={item => item.node.image.uri}
           />
         </ScrollView>
         <View style={selectingImageContainer}>
-          {showImages()}
+          <GestureRecognizer
+            onSwipeUp={(state) => this.onSwipeUp(state)}
+            config={swipeConfig}
+          >
+            {showImages()}
+          </GestureRecognizer>
         </View>
         <ItemAddons addImage={this.handleAddImage} />
       </View>
