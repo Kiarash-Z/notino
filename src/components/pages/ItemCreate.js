@@ -4,10 +4,13 @@ import { View,
         TouchableHighlight,
         FlatList, ScrollView,
         Picker,
-         LayoutAnimation,
+        Text,
+        TouchableWithoutFeedback,
+        LayoutAnimation,
         UIManager } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-gestures';
 import ImagePicker from 'react-native-image-picker';
+import Modal from 'react-native-simple-modal';
 import { Actions } from 'react-native-router-flux';
 import { Navigation, Input, ItemSection, Icon } from '../common';
 import ItemAddons from '../elements/ItemAddons';
@@ -26,8 +29,10 @@ class ItemCreate extends Component {
     this.state = {
       images: [],
       selectedImages: [],
-      showImagesModal: false,
-      selectedInput: 'ورزشی'
+      showGallerySelector: false,
+      showImageModal: false,
+      selectedInput: 'ورزشی',
+      openedImage: { node: { image: { uri: ' ', width: 0, height: 0 } } }
     };
     // enable animation
 
@@ -39,7 +44,7 @@ class ItemCreate extends Component {
     this.renderImages = this.renderImages.bind(this);
     this.renderSelectedImages = this.renderSelectedImages.bind(this);
     this.onSwipeUp = this.onSwipeUp.bind(this);
-    this.expandImage = this.expandImage.bind(this);
+    this.openImageModal = this.openImageModal.bind(this);
     this.removeImage = this.removeImage.bind(this);
   }
   // open gallery on swipe
@@ -53,21 +58,14 @@ class ItemCreate extends Component {
               ...this.state.selectedImages,
               { node: { image: { uri: response.uri } } }
             ],
-          showImagesModal: false
+          showGallerySelector: false
           });
     });
   }
-  // this func will change image
+  // this func will expand image in modal
 
-  expandImage(uri) {
-      const selectedImages = this.state.selectedImages.map((image) => {
-        if (image.node.image.uri === uri) {
-          LayoutAnimation.spring();
-          image.expanded = !image.expanded;
-        }
-        return image;
-      });
-      this.setState({ selectedImages });
+  openImageModal(image) {
+      this.setState({ showImageModal: true, openedImage: image });
   }
   // this func will remove image
   removeImage(uri) {
@@ -82,7 +80,7 @@ class ItemCreate extends Component {
     LayoutAnimation.easeInEaseOut();
     this.setState({
       images,
-      showImagesModal: !this.state.showImagesModal
+      showGallerySelector: !this.state.showGallerySelector
     });
   }
   // this will render images from gallery
@@ -100,7 +98,7 @@ class ItemCreate extends Component {
             }
             this.setState({
               selectedImages: [...this.state.selectedImages, { ...item, expanded: false }],
-              showImagesModal: false
+              showGallerySelector: false
             });
             }}
           underlayColor='transparent'
@@ -115,21 +113,18 @@ class ItemCreate extends Component {
   // this will renders user selected images
 
   renderSelectedImages({ item }) {
-    const expandedHeight = item.expanded ? 250 : 70;
-    const evaluatedOpacity = item.expanded ? 0 : 0.5;
-    const iconDisplay = item.expanded ? 'none' : 'flex';
     return (
       <TouchableHighlight
-         onPress={() => this.expandImage(item.node.image.uri)}
+         onPress={() => this.openImageModal(item)}
          onLongPress={() => this.removeImage(item.node.image.uri)}
       >
         <View style={{ position: 'relative' }}>
           <View style={styles.filterContainerStyle}>
-            <View style={[styles.blackFilterStyle, { opacity: evaluatedOpacity }]} />
-            <Icon style={{ display: iconDisplay }}name="picture" size={27} color="white" />
+            <View style={styles.blackFilterStyle} />
+            <Icon name="picture" size={27} color="white" />
           </View>
           <Image
-            style={[styles.imageStyle, { height: expandedHeight }]}
+            style={styles.imageStyle}
             source={{ uri: item.node.image.uri }}
           />
         </View>
@@ -137,13 +132,17 @@ class ItemCreate extends Component {
     );
   }
   render() {
-    const { sectionStyle, selectingImageContainer, } = styles;
+    const { sectionStyle,
+            selectingImageContainer,
+            openedImageStyle,
+            modalStyle,
+            modalTextStyle } = styles;
     const swipeConfig = {
         velocityThreshold: 0.3,
         directionalOffsetThreshold: 80
       };
     const showImages = () => {
-      if (this.state.showImagesModal) {
+      if (this.state.showGallerySelector) {
         return (
           <FlatList
               data={this.state.images}
@@ -154,70 +153,88 @@ class ItemCreate extends Component {
         );
       }
     };
+    const openedImage = this.state.openedImage.node.image;
     return (
-      <View style={{ flex: 0.92 }}>
-        <Navigation
-          rightInfo="ذخیره"
-          rightInfoColor="#0288eb"
-          leftIcon="back"
-          onLeftButtonPress={() => Actions.category()}
-        />
-        <ScrollView>
-          <View style={{ paddingRight: 10 }}>
-            <ItemSection style={{ ...sectionStyle, borderTopWidth: 0 }}>
-              <Input
-                align="right"
-                placeholder="تیتر"
-                bordered
-                size={15}
-              />
-            </ItemSection>
+      <View style={{ flex: 1 }}>
 
-            <ItemSection style={sectionStyle}>
-              <Input
-                align="right"
-                placeholder="توضیح کوتاه"
-                bordered
-                size={15}
-              />
-            </ItemSection>
+        <View style={{ flex: 1, backgroundColor: 'white' }}>
+            <Navigation
+              rightInfo="ذخیره"
+              rightInfoColor="#0288eb"
+              leftIcon="back"
+              onLeftButtonPress={() => Actions.category()}
+            />
+          <ScrollView>
+            <View style={{ paddingRight: 10 }}>
+              <ItemSection style={{ ...sectionStyle, borderTopWidth: 0 }}>
+                <Input
+                  align="right"
+                  placeholder="تیتر"
+                  bordered
+                  size={15}
+                />
+              </ItemSection>
 
-            <ItemSection style={sectionStyle}>
-              <Picker
-              selectedValue={this.state.selectedInput}
-              onValueChange={(itemValue) => this.setState({ selectedInput: itemValue })}
-              >
-              <Picker.Item label="ورزشی" value="varzeshi" />
-              <Picker.Item label="مطالعه" value="motalee" />
-            </Picker>
-            </ItemSection>
+              <ItemSection style={sectionStyle}>
+                <Input
+                  align="right"
+                  placeholder="توضیح کوتاه"
+                  bordered
+                  size={15}
+                />
+              </ItemSection>
 
+              <ItemSection style={sectionStyle}>
+                <Picker
+                selectedValue={this.state.selectedInput}
+                onValueChange={(itemValue) => this.setState({ selectedInput: itemValue })}
+                >
+                <Picker.Item label="ورزشی" value="varzeshi" />
+                <Picker.Item label="مطالعه" value="motalee" />
+              </Picker>
+              </ItemSection>
 
-            <ItemSection style={sectionStyle}>
-              <Input
-                align="right"
-                placeholder="لینک"
-                bordered
-                size={15}
-              />
-            </ItemSection>
+              <ItemSection style={sectionStyle}>
+                <Input
+                  align="right"
+                  placeholder="لینک"
+                  bordered
+                  size={15}
+                />
+              </ItemSection>
+            </View>
+            <FlatList
+                data={this.state.selectedImages}
+                renderItem={this.renderSelectedImages}
+                keyExtractor={item => item.node.image.uri}
+            />
+          </ScrollView>
+          <View style={selectingImageContainer}>
+            <GestureRecognizer
+              onSwipeUp={(state) => this.onSwipeUp(state)}
+              config={swipeConfig}
+            >
+              {showImages()}
+            </GestureRecognizer>
           </View>
-
-          <FlatList
-              data={this.state.selectedImages}
-              renderItem={this.renderSelectedImages}
-              keyExtractor={item => item.node.image.uri}
-          />
-        </ScrollView>
-        <View style={selectingImageContainer}>
-          <GestureRecognizer
-            onSwipeUp={(state) => this.onSwipeUp(state)}
-            config={swipeConfig}
-          >
-            {showImages()}
-          </GestureRecognizer>
+          <ItemAddons addImage={this.handleAddImage} />
         </View>
-        <ItemAddons addImage={this.handleAddImage} />
+        <Modal
+          open={this.state.showImageModal}
+          modalDidClose={() => this.setState({ showImageModal: false })}
+          modalStyle={modalStyle}
+        >
+          <Image
+            style={openedImageStyle}
+            source={{ uri: openedImage.uri }}
+          />
+          <TouchableWithoutFeedback onPress={() => this.setState({ showImageModal: false })}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={modalTextStyle}>بستن</Text>
+              <Icon name="close" size={11} color="white" />
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
       </View>
     );
   }
@@ -245,6 +262,12 @@ const styles = {
     height: 70,
     resizeMode: 'cover'
   },
+  openedImageStyle: {
+    flex: 1,
+    height: 260,
+    marginBottom: 10,
+    resizeMode: 'cover'
+  },
   filterContainerStyle: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -256,6 +279,20 @@ const styles = {
     left: 0,
     zIndex: 2
   },
+  modalStyle: {
+    height: 250,
+    paddingTop: 0,
+    paddingRight: 0,
+    paddingLeft: 0,
+    backgroundColor: 'transparent'
+  },
+  modalTextStyle: {
+     alignSelf: 'center',
+     color: 'white',
+     fontFamily: 'IS_Bold',
+     fontSize: 16,
+     marginRight: 5
+  },
   blackFilterStyle: {
     backgroundColor: 'black',
     position: 'absolute',
@@ -264,7 +301,8 @@ const styles = {
     right: 0,
     height: 70,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    opacity: 0.5
   }
 };
 export default ItemCreate;

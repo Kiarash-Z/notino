@@ -35,7 +35,10 @@ class Category extends Component {
               <Text style={moreInfoTextStyle}>اطلاعاتی در مورد باشگاه</Text>
             </ListItem>
           </ItemSection>
-          <ActionButton onPress={() => Actions.itemCreate()} buttonColor="#218ffe" />
+          <ActionButton
+            icon={<Icon name="add" size={14} color="white" />}
+            onPress={() => Actions.itemCreate()} buttonColor="#218ffe"
+          />
         </View>
     );
   }
