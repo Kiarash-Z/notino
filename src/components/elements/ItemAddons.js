@@ -22,7 +22,7 @@ class ItemAddons extends Component {
       return (
         <View style={containerStyle}>
           <Icon name="voice" size={21} color="#7b75f9" />
-          <Icon name="makan" size={21} color="#7b75f9" />
+          <Icon name="makan" onPress={this.props.addLocation}size={21} color="#7b75f9" />
           <View>
             <View style={circleStyle} />
             <Icon name="alarm" size={21} color="#7b75f9" />

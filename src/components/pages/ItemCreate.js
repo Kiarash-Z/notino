@@ -5,11 +5,14 @@ import { View,
         FlatList, ScrollView,
         Picker,
         Text,
+        StyleSheet,
         TouchableWithoutFeedback,
         LayoutAnimation,
         UIManager } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-gestures';
+import { BoxShadow } from 'react-native-shadow';
 import ImagePicker from 'react-native-image-picker';
+import MapView, { Marker } from 'react-native-maps';
 import Modal from 'react-native-simple-modal';
 import { Actions } from 'react-native-router-flux';
 import { Navigation, Input, ItemSection, Icon } from '../common';
@@ -27,12 +30,14 @@ class ItemCreate extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      itemsToBeRendered: [],
       images: [],
-      selectedImages: [],
       showGallerySelector: false,
       showImageModal: false,
       selectedInput: 'ورزشی',
-      openedImage: { node: { image: { uri: ' ', width: 0, height: 0 } } }
+      openedImage: { node: { image: { uri: ' ', width: 0, height: 0 } } },
+      marker: { coordinate: { latitude: 35.690298, longitude: 51.384343 } },
+      showMapModal: false
     };
     // enable animation
 
@@ -42,25 +47,37 @@ class ItemCreate extends Component {
 
     this.handleAddImage = this.handleAddImage.bind(this);
     this.renderImages = this.renderImages.bind(this);
-    this.renderSelectedImages = this.renderSelectedImages.bind(this);
+    this.renderAllItems = this.renderAllItems.bind(this);
     this.onSwipeUp = this.onSwipeUp.bind(this);
     this.openImageModal = this.openImageModal.bind(this);
     this.removeImage = this.removeImage.bind(this);
+    this.handleMapPress = this.handleMapPress.bind(this);
+    this.addLocation = this.addLocation.bind(this);
+    this.addMapToList = this.addMapToList.bind(this);
+    this.removeMap = this.removeMap.bind(this);
   }
   // open gallery on swipe
   onSwipeUp() {
-  ImagePicker.showImagePicker(ImagePickerOptions, (response) => {
-    if (response.didCancel || response.error || response.customButton) {
-      return false;
+    ImagePicker.showImagePicker(ImagePickerOptions, (response) => {
+      if (response.didCancel || response.error || response.customButton) {
+        return false;
+      }
+      this.setState({
+        itemsToBeRendered: [
+                ...this.state.itemsToBeRendered,
+                { type: 'image', node: { image: { uri: response.uri } } }
+              ],
+            showGallerySelector: false
+            });
+      });
+  }
+  itemsKeyExtractor(item) {
+    switch (item.type) {
+      case 'image':
+        return item.node.image.uri;
+      case 'map':
+        return item.coordinate.longitude + item.coordinate.latitude;
     }
-    this.setState({
-      selectedImages: [
-              ...this.state.selectedImages,
-              { node: { image: { uri: response.uri } } }
-            ],
-          showGallerySelector: false
-          });
-    });
   }
   // this func will expand image in modal
 
@@ -69,13 +86,23 @@ class ItemCreate extends Component {
   }
   // this func will remove image
   removeImage(uri) {
-    const selectedImages = this.state.selectedImages.filter((image) => {
-      return image.node.image.uri !== uri;
+    const selectedImages = this.state.itemsToBeRendered.filter((item) => {
+      if (item.type !== 'image') {
+        return true;
+      }
+      return item.node.image.uri !== uri;
     });
-    this.setState({ selectedImages });
+    this.setState({ itemsToBeRendered: selectedImages });
   }
   // this will show up images section on icon press
-
+  removeMap() {
+    const updatedState = this.state.itemsToBeRendered.filter((item) => {
+      return item.type !== 'map';
+    });
+    this.setState({
+      itemsToBeRendered: updatedState
+    });
+  }
   handleAddImage(images) {
     LayoutAnimation.easeInEaseOut();
     this.setState({
@@ -83,6 +110,16 @@ class ItemCreate extends Component {
       showGallerySelector: !this.state.showGallerySelector
     });
   }
+
+
+  handleMapPress(e) {
+    this.setState({
+      marker: {
+        coordinate: e.nativeEvent.coordinate
+      }
+    });
+  }
+
   // this will render images from gallery
 
   renderImages({ item }) {
@@ -90,14 +127,17 @@ class ItemCreate extends Component {
         <TouchableHighlight
           onPress={() => {
             // checks for duplication
-            const checkDuplicate = this.state.selectedImages.filter((image) => {
-              return item.node.image.uri === image.node.image.uri;
+            const checkDuplicate = this.state.itemsToBeRendered.filter((i) => {
+              if (i.type === 'image') {
+                return i.node.image.uri === item.node.image.uri;
+              }
+              return false;
             });
             if (checkDuplicate.length > 0) {
               return false;
             }
             this.setState({
-              selectedImages: [...this.state.selectedImages, { ...item, expanded: false }],
+              itemsToBeRendered: [...this.state.itemsToBeRendered, { ...item, type: 'image' }],
               showGallerySelector: false
             });
             }}
@@ -110,33 +150,102 @@ class ItemCreate extends Component {
       </TouchableHighlight>
     );
   }
-  // this will renders user selected images
+  addLocation() {
+    this.setState({
+      showMapModal: true
+    });
+  }
+  addMapToList() {
+    const mapExist = this.state.itemsToBeRendered.filter(item => {
+      return item.type === 'map';
+    });
+    if (mapExist.length > 0) {
+      const updatedMap = {
+        ...this.state.marker,
+         type: 'map'
+      };
+      const updatedState = this.state.itemsToBeRendered.map(item => {
+          if (item.type === 'map') {
+            item = updatedMap;
+          }
+        return item;
+        });
+      this.setState({
+        showMapModal: false,
+        itemsToBeRendered: updatedState
+      });
+    }
+    else {
+      this.setState({
+        showMapModal: false,
+        itemsToBeRendered: [...this.state.itemsToBeRendered, {
+          ...this.state.marker,
+          type: 'map'
+        }]
+      });
+    }
+  }
+  // this will render all items such as voice location alarm and images
 
-  renderSelectedImages({ item }) {
-    return (
-      <TouchableHighlight
-         onPress={() => this.openImageModal(item)}
-         onLongPress={() => this.removeImage(item.node.image.uri)}
-      >
-        <View style={{ position: 'relative' }}>
-          <View style={styles.filterContainerStyle}>
-            <View style={styles.blackFilterStyle} />
-            <Icon name="picture" size={27} color="white" />
-          </View>
-          <Image
-            style={styles.imageStyle}
-            source={{ uri: item.node.image.uri }}
-          />
+  renderAllItems({ item }) {
+    switch (item.type) {
+      case 'image':
+        return (
+          <TouchableHighlight
+            onPress={() => this.openImageModal(item)}
+            onLongPress={() => this.removeImage(item.node.image.uri)}
+          >
+              <View style={{ position: 'relative' }}>
+                <View style={styles.filterContainerStyle}>
+                  <View style={styles.blackFilterStyle} />
+                  <Icon name="picture" size={27} color="white" />
+                </View>
+                <Image
+                  style={styles.imageStyle}
+                  source={{ uri: item.node.image.uri }}
+                />
+              </View>
+            </TouchableHighlight>
+          );
+    case 'map': {
+      return (
+        <View style={{ flex: 1, height: 70 }}>
+          <MapView
+            style={{
+              ...StyleSheet.absoluteFillObject,
+            }}
+            onLongPress={this.removeMap}
+            onPress={this.handleMapPress}
+            initialRegion={{
+              latitude: this.state.marker.coordinate.latitude + 0.001,
+              longitude: this.state.marker.coordinate.longitude,
+              latitudeDelta: 0.005,
+              longitudeDelta: 0.005
+            }}
+          >
+            <Marker {...this.state.marker}>
+              <BoxShadow setting={shadowOpt}>
+              <View style={styles.markerStyle} />
+              </BoxShadow>
+            </Marker>
+          </MapView>
         </View>
-      </TouchableHighlight>
-    );
+      );
+    }
+    default:
+      return false;
+    }
   }
   render() {
     const { sectionStyle,
             selectingImageContainer,
             openedImageStyle,
-            modalStyle,
-            modalTextStyle } = styles;
+            imageModalStyle,
+            markerStyle,
+            mapModalStyle,
+            mapModalTextStyle,
+            mapModalTitleStyle,
+            imageModalTextStyle } = styles;
     const swipeConfig = {
         velocityThreshold: 0.3,
         directionalOffsetThreshold: 80
@@ -154,6 +263,39 @@ class ItemCreate extends Component {
       }
     };
     const openedImage = this.state.openedImage.node.image;
+    const showMapPoint = () => {
+      if (Object.keys(this.state.marker).length !== 0) {
+        return (
+            <Marker {...this.state.marker}>
+              <BoxShadow setting={shadowOpt}>
+              <View style={markerStyle} />
+              </BoxShadow>
+            </Marker>
+
+        );
+      }
+    };
+
+    const mapSaveAndCloseToggle = () => {
+      if (Object.keys(this.state.marker).length !== 0) {
+        return (
+          <TouchableWithoutFeedback onPress={this.addMapToList}>
+            <View style={styles.modalBottomContainerStyle}>
+              <Text style={mapModalTextStyle}>ذخیره</Text>
+              <Icon name="checkmark" size={17} color="#0087ed" />
+            </View>
+          </TouchableWithoutFeedback>
+        );
+      }
+      return (
+        <TouchableWithoutFeedback onPress={() => this.setState({ showMapModal: false })}>
+          <View style={styles.modalBottomContainerStyle}>
+            <Text style={[imageModalTextStyle, { color: 'black' }]}>بستن</Text>
+            <Icon name="close" size={11} color="black" />
+          </View>
+        </TouchableWithoutFeedback>
+      );
+    };
     return (
       <View style={{ flex: 1 }}>
 
@@ -204,9 +346,9 @@ class ItemCreate extends Component {
               </ItemSection>
             </View>
             <FlatList
-                data={this.state.selectedImages}
-                renderItem={this.renderSelectedImages}
-                keyExtractor={item => item.node.image.uri}
+                data={this.state.itemsToBeRendered}
+                renderItem={this.renderAllItems}
+                keyExtractor={this.itemsKeyExtractor}
             />
           </ScrollView>
           <View style={selectingImageContainer}>
@@ -217,28 +359,63 @@ class ItemCreate extends Component {
               {showImages()}
             </GestureRecognizer>
           </View>
-          <ItemAddons addImage={this.handleAddImage} />
+          <ItemAddons addLocation={this.addLocation} addImage={this.handleAddImage} />
         </View>
         <Modal
           open={this.state.showImageModal}
           modalDidClose={() => this.setState({ showImageModal: false })}
-          modalStyle={modalStyle}
+          modalStyle={imageModalStyle}
         >
           <Image
             style={openedImageStyle}
             source={{ uri: openedImage.uri }}
           />
           <TouchableWithoutFeedback onPress={() => this.setState({ showImageModal: false })}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={modalTextStyle}>بستن</Text>
+            <View style={styles.modalBottomContainerStyle}>
+              <Text style={imageModalTextStyle}>بستن</Text>
               <Icon name="close" size={11} color="white" />
             </View>
           </TouchableWithoutFeedback>
+        </Modal>
+        <Modal
+          open={this.state.showMapModal}
+          modalDidClose={() => this.setState({ showMapModal: false })}
+          modalStyle={mapModalStyle}
+        >
+          <Text style={mapModalTitleStyle}>مکان خودتون رو انتخاب کنید!</Text>
+          <View style={{ flex: 1, height: 70 }}>
+            <MapView
+              style={{
+                ...StyleSheet.absoluteFillObject,
+              }}
+              onPress={this.handleMapPress}
+              initialRegion={{
+                latitude: this.state.marker.coordinate.latitude,
+                longitude: this.state.marker.coordinate.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421
+              }}
+            >
+              {showMapPoint()}
+            </MapView>
+          </View>
+            {mapSaveAndCloseToggle()}
         </Modal>
       </View>
     );
   }
 }
+const shadowOpt = {
+	width: 15,
+	height: 15,
+	color: '#0087ed',
+	border: 0,
+	radius: 5,
+	opacity: 0.12,
+	x: 0,
+	y: 3,
+	style: { marginVertical: 5 }
+};
 const styles = {
   sectionStyle: {
     paddingTop: 4,
@@ -279,19 +456,20 @@ const styles = {
     left: 0,
     zIndex: 2
   },
-  modalStyle: {
+  imageModalStyle: {
     height: 250,
     paddingTop: 0,
     paddingRight: 0,
     paddingLeft: 0,
     backgroundColor: 'transparent'
   },
-  modalTextStyle: {
+  imageModalTextStyle: {
      alignSelf: 'center',
      color: 'white',
      fontFamily: 'IS_Bold',
      fontSize: 16,
-     marginRight: 5
+     marginRight: 5,
+     marginTop: 5
   },
   blackFilterStyle: {
     backgroundColor: 'black',
@@ -303,6 +481,37 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     opacity: 0.5
+  },
+  markerStyle: {
+    backgroundColor: '#0087ed',
+    width: 15,
+    height: 15,
+    borderRadius: 15
+  },
+  modalBottomContainerStyle: {
+     flexDirection: 'row',
+     alignItems: 'center',
+     justifyContent: 'center'
+  },
+  mapModalStyle: {
+    height: 400,
+    paddingRight: 0,
+    paddingLeft: 0
+  },
+  mapModalTextStyle: {
+    alignSelf: 'center',
+    color: '#0087ed',
+    fontFamily: 'IS_Bold',
+    fontSize: 16,
+    marginRight: 5,
+    marginTop: 5
+  },
+  mapModalTitleStyle: {
+    alignSelf: 'center',
+    color: 'black',
+    fontFamily: 'IS_Reg',
+    fontSize: 15,
+    marginBottom: 5
   }
 };
 export default ItemCreate;
