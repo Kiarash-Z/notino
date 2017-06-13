@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, CameraRoll } from 'react-native';
+import { View, CameraRoll, TouchableWithoutFeedback } from 'react-native';
 
 import { Icon } from '../common';
 
@@ -21,13 +21,16 @@ class ItemAddons extends Component {
       const { containerStyle, circleStyle } = styles;
       return (
         <View style={containerStyle}>
-          <Icon name="voice" size={21} color="#7b75f9" />
-          <Icon name="makan" onPress={this.props.addLocation}size={21} color="#7b75f9" />
+          <TouchableWithoutFeedback
+            onPressIn={this.props.addVoice}
+            onPressOut={this.props.cancelVoice}>
+            <Icon name="voice" size={21} color="#7b75f9" />
+          </TouchableWithoutFeedback>
+          <Icon name="makan" onPress={this.props.addLocation} size={21} color="#7b75f9" />
           <View>
             <View style={circleStyle} />
-            <Icon name="alarm" size={21} color="#7b75f9" />
-          </View>
-
+              <Icon name="alarm" size={21} color="#7b75f9" />
+            </View>
           <Icon onPress={this.addImage} name="link" size={21} color="#7b75f9" />
         </View>
       );
