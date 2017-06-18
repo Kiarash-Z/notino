@@ -21,11 +21,13 @@ class ItemAddons extends Component {
       const { containerStyle, circleStyle } = styles;
       return (
         <View style={containerStyle}>
-          <TouchableWithoutFeedback
-            onPressIn={this.props.addVoice}
-            onPressOut={this.props.cancelVoice}>
-            <Icon name="voice" size={21} color="#7b75f9" />
-          </TouchableWithoutFeedback>
+              <TouchableWithoutFeedback
+                onPressIn={this.props.startRecordingVoice}
+                onPressOut={this.props.saveVoice}
+                pressRetentionOffset={{ top: 1300, right: 1300, left: 510, bottom: 1100 }}
+              >
+                <Icon name="voice" size={21} color="#7b75f9" />
+              </TouchableWithoutFeedback>
           <Icon name="makan" onPress={this.props.addLocation} size={21} color="#7b75f9" />
           <View>
             <View style={circleStyle} />

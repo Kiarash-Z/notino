@@ -16,11 +16,13 @@
     "react-native": "0.44.0",
     "react-native-action-button": "^2.6.9",
     "react-native-audio": "^3.2.2",
+    "react-native-fs": "^2.3.3",
     "react-native-image-picker": "^0.26.3",
     "react-native-maps": "^0.15.2",
     "react-native-router-flux": "^3.39.2",
     "react-native-shadow": "^1.1.2",
     "react-native-simple-modal": "^6.0.0",
+    "react-native-sound": "^0.10.1",
     "react-native-svg": "5.1.8",
     "react-native-swipe-gestures": "^1.0.2",
     "react-native-vector-icons": "^4.2.0"

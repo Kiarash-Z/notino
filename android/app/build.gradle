@@ -134,6 +134,8 @@ dependencies {
     compile project(':react-native-maps')
     compile project(':react-native-svg')
     compile project(':react-native-audio')
+    compile project(':react-native-sound')
+    compile project(':react-native-fs')
 }
 
 // Run this once to be able to run the application with BUCK

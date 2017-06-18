@@ -4,22 +4,24 @@ import { View,
         TouchableHighlight,
         FlatList, ScrollView,
         Picker,
+        Animated,
         Text,
         StyleSheet,
         TouchableWithoutFeedback,
         LayoutAnimation,
         UIManager } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-gestures';
-import {AudioRecorder, AudioUtils} from 'react-native-audio';
+import { AudioRecorder, AudioUtils } from 'react-native-audio';
 import { BoxShadow } from 'react-native-shadow';
 import ImagePicker from 'react-native-image-picker';
+import Sound from 'react-native-sound';
+import RNFS from 'react-native-fs';
 import MapView, { Marker } from 'react-native-maps';
 import Modal from 'react-native-simple-modal';
 import { Actions } from 'react-native-router-flux';
 import { Navigation, Input, ItemSection, Icon } from '../common';
 import ItemAddons from '../elements/ItemAddons';
 
-const audioPath = AudioUtils.DocumentDirectoryPath + '/test.aac';
 const ImagePickerOptions = {
   title: 'Select Image',
   storageOptions: {
@@ -38,10 +40,13 @@ class ItemCreate extends Component {
       showImageModal: false,
       selectedInput: 'ورزشی',
       openedImage: { node: { image: { uri: ' ', width: 0, height: 0 } } },
-      marker: { coordinate: { latitude: 35.690298, longitude: 51.384343 } },
+      marker: { coordinate: { latitude: 35.6892, longitude: 51.3890 } },
       showMapModal: false,
       recordVoiceTime: 0,
-      recordingVoiceStat: 'stopped'
+      recordingVoiceStat: 'stopped',
+      voicePathCounter: 1,
+      timelineWidth: 0,
+      playingVoice: ''
     };
     // enable animation
 
@@ -59,9 +64,13 @@ class ItemCreate extends Component {
     this.addLocation = this.addLocation.bind(this);
     this.addMapToList = this.addMapToList.bind(this);
     this.removeMap = this.removeMap.bind(this);
-    this.addVoice = this.addVoice.bind(this);
+    this.startRecordingVoice = this.startRecordingVoice.bind(this);
     this.startVoiceTimer = this.startVoiceTimer.bind(this);
-    this.cancelVoice = this.cancelVoice.bind(this);
+    this.saveVoice = this.saveVoice.bind(this);
+    this.playAndPauseVoice = this.playAndPauseVoice.bind(this);
+    this.getVoiceLayout = this.getVoiceLayout.bind(this);
+    this.progressTimeline = this.progressTimeline.bind(this);
+    this.removeVoice = this.removeVoice.bind(this);
   }
   componentDidUpdate(prevProps, prevState) {
     if (prevState !== this.state) {
@@ -73,6 +82,22 @@ class ItemCreate extends Component {
       }
     }
   }
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        this.setState({
+          marker: {
+            coordinate: {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            }
+          }
+        });
+      },
+      (err) => console.log('could not get location', err),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
+    );
+}
   // open gallery on swipe
   imageContainerSwipeUp() {
     ImagePicker.showImagePicker(ImagePickerOptions, (response) => {
@@ -94,6 +119,8 @@ class ItemCreate extends Component {
         return item.node.image.uri;
       case 'map':
         return item.coordinate.longitude + item.coordinate.latitude;
+      case 'voice':
+        return item.id;
     }
   }
   // this func will expand image in modal
@@ -127,7 +154,6 @@ class ItemCreate extends Component {
       showGallerySelector: !this.state.showGallerySelector
     });
   }
-
 
   handleMapPress(e) {
     this.setState({
@@ -204,15 +230,17 @@ class ItemCreate extends Component {
     }
   }
 
-  addVoice() {
-      AudioRecorder.prepareRecordingAtPath(audioPath, {
+  startRecordingVoice() {
+      const path = `${AudioUtils.DocumentDirectoryPath}/voice${this.state.voicePathCounter}.aac`;
+      AudioRecorder.prepareRecordingAtPath(path, {
         SampleRate: 22050,
         Channels: 1,
         AudioQuality: 'Low',
         AudioEncoding: 'aac'
       });
+      AudioRecorder.startRecording();
       this.setState({
-        showGallerySelector: 'false',
+        showGallerySelector: false,
         recordingVoiceStat: 'started'
       });
   }
@@ -222,15 +250,106 @@ class ItemCreate extends Component {
       this.setState({ recordVoiceTime: newCount });
     }, 1000);
   }
-  cancelVoice() {
+  saveVoice() {
+    const that = this;
+    const path = `${AudioUtils.DocumentDirectoryPath}/voice${this.state.voicePathCounter}.aac`;
+    AudioRecorder.stopRecording();
     clearInterval(this.voiceTimer);
     this.setState({
       recordVoiceTime: 0,
       recordingVoiceStat: 'stopped'
     });
+    const sound = new Sound(path, Sound.MAIN_BUNDLE, (error) => {
+              if (error) {
+                  console.log('failed to load the sound', error);
+              } else if (sound.getDuration() >= 1) {
+                that.setState({
+                  itemsToBeRendered: [
+                    ...that.state.itemsToBeRendered,
+                    {
+                      type: 'voice',
+                      duration: sound.getDuration(),
+                      playingVoiceTime: new Animated.Value(0),
+                      status: 'stopped',
+                      id: that.state.voicePathCounter,
+                      sound
+                    }
+                  ],
+                  voicePathCounter: that.state.voicePathCounter + 1
+                });
+              }
+          });
   }
   // this will render all items such as voice location alarm and images
 
+  playAndPauseVoice(duration, id) {
+    const selectedVoice = this.state.itemsToBeRendered.filter(item => {
+      return item.id === id;
+    })[0];
+    const updatedState = (nextStatus, currentStatus) => {
+      return this.state.itemsToBeRendered.map((item) => {
+        if (item.id === id) {
+          item.status = nextStatus;
+            if (currentStatus === 'stopped') {
+            item.sound = item.sound.play();
+          } else {
+            item.sound = item.sound.pause();
+            item.playingVoiceTime.stopAnimation();
+          }
+        }
+        return item;
+      });
+    };
+    if (selectedVoice.status !== 'started') {
+      this.setState({ itemsToBeRendered: updatedState('started', 'stopped') });
+      selectedVoice.sound.getCurrentTime(seconds => {
+        Animated.sequence([
+          Animated.timing(selectedVoice.playingVoiceTime, {
+            duration: (duration - seconds) * 1000,
+            toValue: 1,
+            Easing: 'linear'
+          }),
+          Animated.timing(selectedVoice.playingVoiceTime, {
+            duration: 0,
+            toValue: 0
+          })
+        ]).start(() => {
+          this.setState({
+            itemsToBeRendered: updatedState('stopped', 'started')
+          });
+        });
+      });
+    } else {
+      this.setState({ itemsToBeRendered: updatedState('paused', 'started') });
+    }
+  }
+  removeVoice(id) {
+    const updatedState = this.state.itemsToBeRendered.filter(item => {
+      if (item.type !== 'voice') {
+        return true;
+      } else if (item.id === id) {
+        item.sound.stop();
+        return false;
+      }
+        return true;
+    });
+    const path = `${AudioUtils.DocumentDirectoryPath}/voice${id}.aac`;
+           this.setState({ itemsToBeRendered: updatedState });
+  }
+  getVoiceLayout(e) {
+    this.setState({
+      timelineWidth: e.nativeEvent.layout.width
+  });
+  }
+  progressTimeline(playingVoiceTime) {
+        const width = playingVoiceTime.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, this.state.timelineWidth]
+        });
+        return {
+          width
+        };
+    }
   renderAllItems({ item }) {
     switch (item.type) {
       case 'image':
@@ -251,35 +370,63 @@ class ItemCreate extends Component {
               </View>
             </TouchableHighlight>
           );
-    case 'map': {
-      return (
-        <View style={{ flex: 1, height: 70 }}>
-          <MapView
-            style={{
-              ...StyleSheet.absoluteFillObject,
-            }}
-            onLongPress={this.removeMap}
-            onPress={this.handleMapPress}
-            initialRegion={{
-              latitude: this.state.marker.coordinate.latitude + 0.001,
-              longitude: this.state.marker.coordinate.longitude,
-              latitudeDelta: 0.005,
-              longitudeDelta: 0.005
-            }}
-          >
-            <Marker {...this.state.marker}>
-              <BoxShadow setting={shadowOpt}>
-              <View style={styles.markerStyle} />
-              </BoxShadow>
-            </Marker>
-          </MapView>
-        </View>
-      );
-    }
-    default:
-      return false;
-    }
-  }
+        case 'map': {
+          return (
+            <View style={{ flex: 1, height: 70 }}>
+              <MapView
+                style={{
+                  ...StyleSheet.absoluteFillObject,
+                }}
+                onLongPress={this.removeMap}
+                onPress={() => this.setState({ showMapModal: true })}
+                initialRegion={{
+                  latitude: this.state.marker.coordinate.latitude + 0.001,
+                  longitude: this.state.marker.coordinate.longitude,
+                  latitudeDelta: 0.005,
+                  longitudeDelta: 0.005
+                }}
+              >
+                  <Marker {...this.state.marker}>
+                    <BoxShadow setting={shadowOpt}>
+                      <View style={styles.markerStyle} />
+                    </BoxShadow>
+                  </Marker>
+                </MapView>
+              </View>
+            );
+          }
+          case 'voice': {
+            const playOrPause = () => {
+              if (item.status !== 'started') {
+                return <Icon name='play' size={18} color='#7b75f9' />;
+              }
+              return <Icon name='pause' size={18} color='#7b75f9' />;
+            };
+            return (
+              <TouchableWithoutFeedback onLongPress={() => this.removeVoice(item.id)}>
+                <View style={styles.voiceContainerStyle}>
+                  <TouchableWithoutFeedback
+                    onPress={() => this.playAndPauseVoice(item.duration, item.id)}
+                  >
+                      {playOrPause()}
+                    </TouchableWithoutFeedback>
+                    <View style={styles.voiceTimelineContainerStyle} onLayout={this.getVoiceLayout}>
+                      <Animated.View
+                        style={[
+                          styles.voiceBgFill,
+                          this.progressTimeline(item.playingVoiceTime),
+                         ]}
+                      />
+                      <View style={styles.voiceTimelineBackground} />
+                    </View>
+                  </View>
+              </TouchableWithoutFeedback>
+            );
+          }
+          default:
+          return false;
+        }
+      }
   render() {
     const { sectionStyle,
             selectingImageContainer,
@@ -289,15 +436,10 @@ class ItemCreate extends Component {
             mapModalStyle,
             recorderContainerStyle,
             recorderTimerStyle,
-            recorderRejectStyle,
             bottomContainerStyle,
             mapModalTextStyle,
             mapModalTitleStyle,
             imageModalTextStyle } = styles;
-    const swipeConfig = {
-        velocityThreshold: 0.3,
-        directionalOffsetThreshold: 80
-      };
     const showImages = () => {
       if (this.state.showGallerySelector) {
         return (
@@ -362,7 +504,6 @@ class ItemCreate extends Component {
             <Text style={recorderTimerStyle}>
               {formatSeconds(this.state.recordVoiceTime)}
             </Text>
-            <Text style={recorderRejectStyle}>برای لغو انگشتتون رو بالا بکشید!</Text>
           </View>
         );
       }
@@ -420,22 +561,20 @@ class ItemCreate extends Component {
                 data={this.state.itemsToBeRendered}
                 renderItem={this.renderAllItems}
                 keyExtractor={this.itemsKeyExtractor}
+                style={{ backgroundColor: 'white' }}
             />
           </ScrollView>
           <View style={bottomContainerStyle}>
             <View style={selectingImageContainer}>
-              <GestureRecognizer
-                imageContainerSwipeUp={(state) => this.imageContainerSwipeUp(state)}
-                config={swipeConfig}
-              >
+              <GestureRecognizer onSwipeUp={this.imageContainerSwipeUp}>
                   {showImages()}
-                </GestureRecognizer>
+              </GestureRecognizer>
               </View>
               {showRecordingVoice()}
           </View>
           <ItemAddons
-            addVoice={this.addVoice}
-            cancelVoice={this.cancelVoice}
+            startRecordingVoice={this.startRecordingVoice}
+            saveVoice={this.saveVoice}
             addLocation={this.addLocation}
             addImage={this.addImage}
           />
@@ -606,17 +745,45 @@ const styles = {
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'white'
+    backgroundColor: 'white',
+    paddingBottom: 10,
+    paddingTop: 10
   },
   recorderTimerStyle: {
     fontFamily: 'IS_Med',
     color: '#e74c3c',
     fontSize: 18
   },
-  recorderRejectStyle: {
-    fontFamily: 'IS_Reg',
-    color: '#3a3a3a',
-    fontSize: 13
+  voiceContainerStyle: {
+    paddingTop: 15,
+    paddingBottom: 15,
+    paddingLeft: 30,
+    paddingRight: 30,
+    flex: 1,
+    flexDirection: 'row'
+  },
+  voiceTimelineContainerStyle: {
+    position: 'relative',
+    flex: 1,
+    marginLeft: 10,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  voiceBgFill: {
+    position: 'absolute',
+    right: 0,
+    left: 0,
+    height: 3,
+    zIndex: 1,
+    backgroundColor: '#31556b'
+  },
+  voiceTimelineBackground: {
+    position: 'absolute',
+    flex: 1,
+    left: 0,
+    right: 0,
+    height: 3,
+    backgroundColor: '#bdc8ce'
   }
 };
 export default ItemCreate;
