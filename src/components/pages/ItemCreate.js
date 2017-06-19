@@ -335,6 +335,7 @@ class ItemCreate extends Component {
     });
     const path = `${AudioUtils.DocumentDirectoryPath}/voice${id}.aac`;
            this.setState({ itemsToBeRendered: updatedState });
+           RNFS.unlink(path);
   }
   getVoiceLayout(e) {
     this.setState({
@@ -516,7 +517,7 @@ class ItemCreate extends Component {
               rightInfo="ذخیره"
               rightInfoColor="#0288eb"
               leftIcon="back"
-              onLeftButtonPress={() => Actions.category()}
+              onLeftButtonPress={() => Actions.pop()}
             />
           <ScrollView>
             <View style={{ paddingRight: 10 }}>

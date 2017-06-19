@@ -7,22 +7,22 @@ import ItemCreate from './components/pages/ItemCreate';
 const RouterComponent = () => {
   return (
     <Router>
-      <Scene
-        key="category"
-        component={Category}
-        hideNavBar
-        initial
-      />
-      <Scene
-        key="categories"
-        component={Categories}
-        hideNavBar
-      />
-      <Scene
-        key="itemCreate"
-        component={ItemCreate}
-        hideNavBar
-      />
+        <Scene
+          key="category"
+          component={Category}
+          hideNavBar
+          initial
+        />
+        <Scene
+          key="categories"
+          component={Categories}
+          hideNavBar
+        />
+        <Scene
+          key="itemCreate"
+          component={ItemCreate}
+          hideNavBar
+        />
     </Router>
   );
 };

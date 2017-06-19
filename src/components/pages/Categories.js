@@ -13,7 +13,7 @@ class Categories extends Component {
           rightIcon="category"
           rightInfo="دسته بندی ها"
           leftIcon="back"
-          onLeftButtonPress={() => { Actions.category(); }}
+          onLeftButtonPress={() => Actions.pop()}
         />
         <View style={itemsContainerStyle}>
           <View style={columnStyle}>
