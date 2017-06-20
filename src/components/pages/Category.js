@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableHighlight } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import ActionButton from 'react-native-action-button';
 import Header from '../elements/Header';
@@ -12,15 +12,11 @@ class Category extends Component {
     return (
         <View style={{ flex: 1 }}>
           {/* Navigation */}
-
           <Navigation
             rightIcon='category'
-            leftIcon='menu'
+            leftIcon='search'
             onRightButtonPress={() => Actions.categories()}
-          >
-            <Icon name="search" size={14} color="#a8b5bd" />
-            <Text style={searchTextStyle}>جستجو بر اساس تیتر و هشتگ</Text>
-          </Navigation>
+          />
           {/* Header */}
 
           <Header />

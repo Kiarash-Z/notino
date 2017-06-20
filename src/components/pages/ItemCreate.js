@@ -46,7 +46,10 @@ class ItemCreate extends Component {
       recordingVoiceStat: 'stopped',
       voicePathCounter: 1,
       timelineWidth: 0,
-      playingVoice: ''
+      playingVoice: '',
+      showRemoveModal: false,
+      itemRemoveType: '',
+      itemRemove: null
     };
     // enable animation
 
@@ -71,6 +74,7 @@ class ItemCreate extends Component {
     this.getVoiceLayout = this.getVoiceLayout.bind(this);
     this.progressTimeline = this.progressTimeline.bind(this);
     this.removeVoice = this.removeVoice.bind(this);
+    this.removeModal = this.removeModal.bind(this);
   }
   componentDidUpdate(prevProps, prevState) {
     if (prevState !== this.state) {
@@ -351,13 +355,36 @@ class ItemCreate extends Component {
           width
         };
     }
+    removeModal() {
+      const item = this.state.itemRemove;
+        switch (item.type) {
+          case 'voice':
+          this.removeVoice(item.id);
+          break;
+          case 'image':
+          this.removeImage(item.node.image.uri);
+          break;
+          case 'map':
+          this.removeMap();
+          break;
+        }
+        this.setState({
+          showRemoveModal: false
+        });
+    }
   renderAllItems({ item }) {
     switch (item.type) {
       case 'image':
         return (
           <TouchableHighlight
             onPress={() => this.openImageModal(item)}
-            onLongPress={() => this.removeImage(item.node.image.uri)}
+            onLongPress={() => {
+              this.setState({
+                itemRemove: item,
+                itemRemoveType: 'عکس',
+                showRemoveModal: true
+              });
+            }}
           >
               <View style={{ position: 'relative' }}>
                 <View style={styles.filterContainerStyle}>
@@ -378,7 +405,13 @@ class ItemCreate extends Component {
                 style={{
                   ...StyleSheet.absoluteFillObject,
                 }}
-                onLongPress={this.removeMap}
+                onLongPress={() => {
+                  this.setState({
+                    itemRemove: item,
+                    itemRemoveType: 'مکان',
+                    showRemoveModal: true
+                  });
+                }}
                 onPress={() => this.setState({ showMapModal: true })}
                 initialRegion={{
                   latitude: this.state.marker.coordinate.latitude + 0.001,
@@ -404,13 +437,21 @@ class ItemCreate extends Component {
               return <Icon name='pause' size={18} color='#7b75f9' />;
             };
             return (
-              <TouchableWithoutFeedback onLongPress={() => this.removeVoice(item.id)}>
+              <TouchableWithoutFeedback onLongPress={() => {
+                this.setState({
+                  itemRemove: item,
+                  itemRemoveType: 'ویس',
+                  showRemoveModal: true
+                });
+              }}
+             >
                 <View style={styles.voiceContainerStyle}>
-                  <TouchableWithoutFeedback
+                  <TouchableHighlight
                     onPress={() => this.playAndPauseVoice(item.duration, item.id)}
+                    underlayColor="rgba(0,0,0,.018)"
                   >
                       {playOrPause()}
-                    </TouchableWithoutFeedback>
+                    </TouchableHighlight>
                     <View style={styles.voiceTimelineContainerStyle} onLayout={this.getVoiceLayout}>
                       <Animated.View
                         style={[
@@ -440,6 +481,10 @@ class ItemCreate extends Component {
             bottomContainerStyle,
             mapModalTextStyle,
             mapModalTitleStyle,
+            removeModalStyle,
+            removeModalChoiceStyle,
+            removeModalQuesStyle,
+            removeModalTextContainerStyle,
             imageModalTextStyle } = styles;
     const showImages = () => {
       if (this.state.showGallerySelector) {
@@ -580,6 +625,26 @@ class ItemCreate extends Component {
             addImage={this.addImage}
           />
         </View>
+        <Modal
+          open={this.state.showRemoveModal}
+          modalDidClose={() => this.setState({ showRemoveModal: false })}
+          modalStyle={removeModalStyle}
+        >
+          <Text style={removeModalQuesStyle}>
+            آیا میخواید این {this.state.itemRemoveType} رو حذف کنید؟
+          </Text>
+          <View style={removeModalTextContainerStyle}>
+            <TouchableHighlight
+              underlayColor='rgba(0,0,0,.018)'
+              onPress={() => this.setState({ showRemoveModal: false })}
+            >
+                <Text style={removeModalChoiceStyle}>خیر</Text>
+              </TouchableHighlight>
+            <TouchableHighlight onPress={this.removeModal} underlayColor='rgba(0,0,0,.018)'>
+              <Text style={removeModalChoiceStyle}>بله</Text>
+            </TouchableHighlight>
+          </View>
+        </Modal>
         <Modal
           open={this.state.showImageModal}
           modalDidClose={() => this.setState({ showImageModal: false })}
@@ -785,6 +850,26 @@ const styles = {
     right: 0,
     height: 3,
     backgroundColor: '#bdc8ce'
+  },
+  removeModalStyle: {
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  removeModalQuesStyle: {
+    fontFamily: 'IS_Med',
+    fontSize: 17
+  },
+  removeModalTextContainerStyle: {
+    flexDirection: 'row',
+    paddingTop: 20
+  },
+  removeModalChoiceStyle: {
+    fontSize: 18,
+    fontFamily: 'IS_Reg',
+    color: '#218ffe',
+    marginRight: 40,
+    marginLeft: 40,
+    borderRadius: 8
   }
 };
 export default ItemCreate;

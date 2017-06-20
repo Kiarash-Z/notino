@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, CameraRoll, TouchableWithoutFeedback } from 'react-native';
+import { View, CameraRoll, TouchableHighlight } from 'react-native';
 
 import { Icon } from '../common';
 
@@ -18,22 +18,43 @@ class ItemAddons extends Component {
       });
     }
     render() {
-      const { containerStyle, circleStyle } = styles;
+      const { containerStyle, circleStyle, touchableStyle } = styles;
       return (
         <View style={containerStyle}>
-              <TouchableWithoutFeedback
+              <TouchableHighlight
+                style={touchableStyle}
                 onPressIn={this.props.startRecordingVoice}
                 onPressOut={this.props.saveVoice}
+                underlayColor="rgba(0,0,0,.018)"
                 pressRetentionOffset={{ top: 1300, right: 1300, left: 510, bottom: 1100 }}
               >
                 <Icon name="voice" size={21} color="#7b75f9" />
-              </TouchableWithoutFeedback>
-          <Icon name="makan" onPress={this.props.addLocation} size={21} color="#7b75f9" />
-          <View>
-            <View style={circleStyle} />
-              <Icon name="alarm" size={21} color="#7b75f9" />
-            </View>
-          <Icon onPress={this.addImage} name="link" size={21} color="#7b75f9" />
+              </TouchableHighlight>
+
+            <TouchableHighlight
+              style={touchableStyle}
+              onPress={this.props.addLocation}
+              underlayColor="rgba(0,0,0,.018)"
+            >
+              <Icon name="makan" size={21} color="#7b75f9" />
+            </TouchableHighlight>
+            <TouchableHighlight
+              style={touchableStyle}
+              onPress={() => true}
+              underlayColor="rgba(0,0,0,.018)"
+            >
+              <View>
+                <View style={circleStyle} />
+                <Icon name="alarm" size={21} color="#7b75f9" />
+              </View>
+            </TouchableHighlight>
+            <TouchableHighlight
+              style={touchableStyle}
+              onPress={this.addImage}
+              underlayColor="rgba(0,0,0,.018)"
+            >
+              <Icon name="link" size={21} color="#7b75f9" />
+            </TouchableHighlight>
         </View>
       );
     }
@@ -41,14 +62,14 @@ class ItemAddons extends Component {
 
 const styles = {
   containerStyle: {
-    paddingTop: 15,
-    paddingBottom: 15,
+    paddingTop: 6,
+    paddingBottom: 6,
     flexDirection: 'row',
     backgroundColor: 'white',
-    justifyContent: 'space-around',
     alignItems: 'center',
     borderTopWidth: 0.8,
-    borderTopColor: 'rgba(0,0,0,.08)'
+    borderTopColor: 'rgba(0,0,0,.08)',
+    justifyContent: 'space-around'
   },
   circleStyle: {
     backgroundColor: '#e02420',
@@ -59,6 +80,11 @@ const styles = {
     width: 7,
     height: 7,
     borderRadius: 7
+  },
+  touchableStyle: {
+    padding: 9,
+    borderRadius: 15,
+    alignItems: 'center'
   }
 };
 
