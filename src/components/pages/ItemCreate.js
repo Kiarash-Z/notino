@@ -9,6 +9,7 @@ import { View,
         StyleSheet,
         TouchableWithoutFeedback,
         LayoutAnimation,
+        Vibration,
         UIManager } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-gestures';
 import { AudioRecorder, AudioUtils } from 'react-native-audio';
@@ -49,7 +50,8 @@ class ItemCreate extends Component {
       playingVoice: '',
       showRemoveModal: false,
       itemRemoveType: '',
-      itemRemove: null
+      itemRemove: null,
+      imageModalWidth: 0
     };
     // enable animation
 
@@ -222,8 +224,7 @@ class ItemCreate extends Component {
         showMapModal: false,
         itemsToBeRendered: updatedState
       });
-    }
-    else {
+    } else {
       this.setState({
         showMapModal: false,
         itemsToBeRendered: [...this.state.itemsToBeRendered, {
@@ -235,6 +236,7 @@ class ItemCreate extends Component {
   }
 
   startRecordingVoice() {
+      Vibration.vibrate([0, 50, 25, 0]);
       const path = `${AudioUtils.DocumentDirectoryPath}/voice${this.state.voicePathCounter}.aac`;
       AudioRecorder.prepareRecordingAtPath(path, {
         SampleRate: 22050,
@@ -255,6 +257,7 @@ class ItemCreate extends Component {
     }, 1000);
   }
   saveVoice() {
+    Vibration.vibrate([0, 50, 25, 0]);
     const that = this;
     const path = `${AudioUtils.DocumentDirectoryPath}/voice${this.state.voicePathCounter}.aac`;
     AudioRecorder.stopRecording();
@@ -448,7 +451,7 @@ class ItemCreate extends Component {
                 <View style={styles.voiceContainerStyle}>
                   <TouchableHighlight
                     onPress={() => this.playAndPauseVoice(item.duration, item.id)}
-                    underlayColor="rgba(0,0,0,.018)"
+                    underlayColor="rgba(0,0,0,0.18)"
                   >
                       {playOrPause()}
                     </TouchableHighlight>
@@ -554,6 +557,16 @@ class ItemCreate extends Component {
         );
       }
     };
+    const imageModalHeight = () => {
+      const width = openedImage.width;
+      const height = openedImage.height;
+      if ((width / height) <= 1.3) {
+        return 380;
+      } else if ((height / width) >= 1.3) {
+        return 250;
+      }
+      return this.state.imageModalWidth;
+    };
     return (
       <View style={{ flex: 1 }}>
 
@@ -635,12 +648,12 @@ class ItemCreate extends Component {
           </Text>
           <View style={removeModalTextContainerStyle}>
             <TouchableHighlight
-              underlayColor='rgba(0,0,0,.018)'
+              underlayColor='rgba(0,0,0,0.023)'
               onPress={() => this.setState({ showRemoveModal: false })}
             >
                 <Text style={removeModalChoiceStyle}>خیر</Text>
               </TouchableHighlight>
-            <TouchableHighlight onPress={this.removeModal} underlayColor='rgba(0,0,0,.018)'>
+            <TouchableHighlight onPress={this.removeModal} underlayColor='rgba(0,0,0,0.023)'>
               <Text style={removeModalChoiceStyle}>بله</Text>
             </TouchableHighlight>
           </View>
@@ -648,12 +661,17 @@ class ItemCreate extends Component {
         <Modal
           open={this.state.showImageModal}
           modalDidClose={() => this.setState({ showImageModal: false })}
-          modalStyle={imageModalStyle}
+          modalStyle={[imageModalStyle, { height: imageModalHeight() }]}
         >
-          <Image
-            style={openedImageStyle}
-            source={{ uri: openedImage.uri }}
-          />
+          <View
+            style={{ flex: 1 }}
+            onLayout={e => this.setState({ imageModalWidth: e.nativeEvent.layout.width })}
+          >
+            <Image
+              style={openedImageStyle}
+              source={{ uri: openedImage.uri }}
+            />
+          </View>
           <TouchableWithoutFeedback onPress={() => this.setState({ showImageModal: false })}>
             <View style={styles.modalBottomContainerStyle}>
               <Text style={imageModalTextStyle}>بستن</Text>
@@ -733,9 +751,8 @@ const styles = {
   },
   openedImageStyle: {
     flex: 1,
-    height: 260,
     marginBottom: 10,
-    resizeMode: 'cover'
+    resizeMode: 'stretch'
   },
   filterContainerStyle: {
     justifyContent: 'center',
@@ -749,10 +766,9 @@ const styles = {
     zIndex: 2
   },
   imageModalStyle: {
-    height: 250,
     paddingTop: 0,
-    paddingRight: 0,
-    paddingLeft: 0,
+    paddingRight: 35,
+    paddingLeft: 35,
     backgroundColor: 'transparent'
   },
   imageModalTextStyle: {

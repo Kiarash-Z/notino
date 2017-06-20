@@ -25,7 +25,7 @@ class ItemAddons extends Component {
                 style={touchableStyle}
                 onPressIn={this.props.startRecordingVoice}
                 onPressOut={this.props.saveVoice}
-                underlayColor="rgba(0,0,0,.018)"
+                underlayColor="rgba(0,0,0,.024)"
                 pressRetentionOffset={{ top: 1300, right: 1300, left: 510, bottom: 1100 }}
               >
                 <Icon name="voice" size={21} color="#7b75f9" />
@@ -34,14 +34,14 @@ class ItemAddons extends Component {
             <TouchableHighlight
               style={touchableStyle}
               onPress={this.props.addLocation}
-              underlayColor="rgba(0,0,0,.018)"
+              underlayColor="rgba(0,0,0,.024)"
             >
               <Icon name="makan" size={21} color="#7b75f9" />
             </TouchableHighlight>
             <TouchableHighlight
               style={touchableStyle}
               onPress={() => true}
-              underlayColor="rgba(0,0,0,.018)"
+              underlayColor="rgba(0,0,0,.024)"
             >
               <View>
                 <View style={circleStyle} />
@@ -51,7 +51,7 @@ class ItemAddons extends Component {
             <TouchableHighlight
               style={touchableStyle}
               onPress={this.addImage}
-              underlayColor="rgba(0,0,0,.018)"
+              underlayColor="rgba(0,0,0,.024)"
             >
               <Icon name="link" size={21} color="#7b75f9" />
             </TouchableHighlight>
