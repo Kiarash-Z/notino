@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableHighlight } from 'react-native';
+import { View, Text, TouchableNativeFeedback } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import ActionButton from 'react-native-action-button';
 import Header from '../elements/Header';
@@ -21,16 +21,25 @@ class Category extends Component {
 
           <Header />
           {/* Items */}
-          <ItemSection>
-            <ListItem icons={['alarm', 'motalee']} title="باشگاه">
-              <Text style={moreInfoTextStyle}>اطلاعاتی در مورد باشگاه</Text>
-            </ListItem>
-          </ItemSection>
-          <ItemSection>
-            <ListItem icons={['alarm', 'motalee']} title="باشگاه">
-              <Text style={moreInfoTextStyle}>اطلاعاتی در مورد باشگاه</Text>
-            </ListItem>
-          </ItemSection>
+          <TouchableNativeFeedback background={TouchableNativeFeedback.SelectableBackground()}>
+            <View>
+              <ItemSection>
+                <ListItem icons={['alarm', 'motalee']} title="باشگاه">
+                  <Text style={moreInfoTextStyle}>اطلاعاتی در مورد باشگاه</Text>
+                </ListItem>
+              </ItemSection>
+            </View>
+        </TouchableNativeFeedback>
+
+        <TouchableNativeFeedback>
+          <View>
+            <ItemSection>
+              <ListItem icons={['alarm', 'motalee']} title="باشگاه">
+                <Text style={moreInfoTextStyle}>اطلاعاتی در مورد باشگاه</Text>
+              </ListItem>
+            </ItemSection>
+          </View>
+        </TouchableNativeFeedback>
           <ActionButton
             icon={<Icon name="add" size={14} color="white" />}
             onPress={() => Actions.itemCreate()} buttonColor="#218ffe"

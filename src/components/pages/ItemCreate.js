@@ -10,6 +10,7 @@ import { View,
         TouchableWithoutFeedback,
         LayoutAnimation,
         Vibration,
+        TouchableNativeFeedback,
         UIManager } from 'react-native';
 import GestureRecognizer from 'react-native-swipe-gestures';
 import { AudioRecorder, AudioUtils } from 'react-native-audio';
@@ -379,27 +380,31 @@ class ItemCreate extends Component {
     switch (item.type) {
       case 'image':
         return (
-          <TouchableHighlight
-            onPress={() => this.openImageModal(item)}
-            onLongPress={() => {
-              this.setState({
-                itemRemove: item,
-                itemRemoveType: 'عکس',
-                showRemoveModal: true
-              });
-            }}
-          >
-              <View style={{ position: 'relative' }}>
+
+              <View>
+                <TouchableNativeFeedback
+                  background={TouchableNativeFeedback.Ripple('#c5c5c5')}
+                  onPress={() => this.openImageModal(item)}
+                  delayPress={200}
+                  onLongPress={() => {
+                      this.setState({
+                        itemRemove: item,
+                        itemRemoveType: 'عکس',
+                        showRemoveModal: true
+                      });
+                  }}
+                >
                 <View style={styles.filterContainerStyle}>
                   <View style={styles.blackFilterStyle} />
                   <Icon name="picture" size={27} color="white" />
                 </View>
+                </TouchableNativeFeedback>
                 <Image
                   style={styles.imageStyle}
                   source={{ uri: item.node.image.uri }}
                 />
               </View>
-            </TouchableHighlight>
+
           );
         case 'map': {
           return (
@@ -435,23 +440,25 @@ class ItemCreate extends Component {
           case 'voice': {
             const playOrPause = () => {
               if (item.status !== 'started') {
-                return <Icon name='play' size={18} color='#7b75f9' />;
+                return <Icon style={{ padding: 5 }} name='play' size={18} color='#7b75f9' />;
               }
-              return <Icon name='pause' size={18} color='#7b75f9' />;
+              return <Icon style={{ padding: 5 }} name='pause' size={18} color='#7b75f9' />;
             };
             return (
-              <TouchableWithoutFeedback onLongPress={() => {
+              <TouchableNativeFeedback
+                background={TouchableNativeFeedback.SelectableBackground()} 
+                onLongPress={() => {
                 this.setState({
                   itemRemove: item,
                   itemRemoveType: 'ویس',
                   showRemoveModal: true
                 });
               }}
-             >
+              >
                 <View style={styles.voiceContainerStyle}>
                   <TouchableHighlight
                     onPress={() => this.playAndPauseVoice(item.duration, item.id)}
-                    underlayColor="rgba(0,0,0,0.18)"
+                    underlayColor="rgba(0,0,0,0.018)"
                   >
                       {playOrPause()}
                     </TouchableHighlight>
@@ -465,7 +472,7 @@ class ItemCreate extends Component {
                       <View style={styles.voiceTimelineBackground} />
                     </View>
                   </View>
-              </TouchableWithoutFeedback>
+              </TouchableNativeFeedback>
             );
           }
           default:
@@ -647,15 +654,26 @@ class ItemCreate extends Component {
             آیا میخواید این {this.state.itemRemoveType} رو حذف کنید؟
           </Text>
           <View style={removeModalTextContainerStyle}>
-            <TouchableHighlight
-              underlayColor='rgba(0,0,0,0.023)'
-              onPress={() => this.setState({ showRemoveModal: false })}
+            <TouchableNativeFeedback
+              background={TouchableNativeFeedback.SelectableBackground()}
+              onPress={() => setTimeout(() => this.setState({ showRemoveModal: false }), 200)}
             >
+              <View>
                 <Text style={removeModalChoiceStyle}>خیر</Text>
-              </TouchableHighlight>
-            <TouchableHighlight onPress={this.removeModal} underlayColor='rgba(0,0,0,0.023)'>
-              <Text style={removeModalChoiceStyle}>بله</Text>
-            </TouchableHighlight>
+              </View>
+              </TouchableNativeFeedback>
+            <TouchableNativeFeedback
+              background={TouchableNativeFeedback.SelectableBackground()}
+              onPress={() => {
+                setTimeout(() => {
+                  this.removeModal();
+                }, 200);
+              }}
+            >
+              <View>
+                <Text style={removeModalChoiceStyle}>بله</Text>
+              </View>
+            </TouchableNativeFeedback>
           </View>
         </Modal>
         <Modal
@@ -733,12 +751,13 @@ const styles = {
     paddingLeft: 10,
     paddingRight: 10,
     position: 'absolute',
-    bottom: 0,
+    bottom: -10,
     left: 0,
     right: 0,
     backgroundColor: 'white'
   },
   selectingImagesStyle: {
+    marginBottom: 10,
     width: 60,
     height: 60,
     borderRadius: 5,
@@ -763,7 +782,7 @@ const styles = {
     top: 0,
     right: 0,
     left: 0,
-    zIndex: 2
+    zIndex: 2,
   },
   imageModalStyle: {
     paddingTop: 0,

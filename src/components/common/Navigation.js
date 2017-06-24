@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableWithoutFeedback } from 'react-native';
 import { Icon } from './index';
 
 class Navigation extends Component {
@@ -15,16 +15,20 @@ class Navigation extends Component {
           } = this.props;
     return (
       <View style={containerStyle}>
-        <View style={infoStyle}>
-          <Icon name={leftIcon} size={25} onPress={onLeftButtonPress} color="#234960" />
-        </View>
+        <TouchableWithoutFeedback onPress={onLeftButtonPress}>
+          <View style={infoStyle}>
+            <Icon name={leftIcon} size={25} color="#234960" />
+          </View>
+        </TouchableWithoutFeedback>
         <View style={searchContainerStyle}>
           {children}
         </View>
-        <View style={infoStyle}>
-          <Text style={[rightInfoTextStyle, { color: rightInfoColor }]}>{rightInfo}</Text>
-          <Icon onPress={onRightButtonPress} name={rightIcon} size={25} color="#234960" />
-        </View>
+        <TouchableWithoutFeedback onPress={onRightButtonPress}>
+          <View style={infoStyle}>
+              <Text style={[rightInfoTextStyle, { color: rightInfoColor }]}>{rightInfo}</Text>
+              <Icon name={rightIcon} size={25} color="#234960" />
+          </View>
+      </TouchableWithoutFeedback>
       </View>
     );
   }
@@ -33,11 +37,11 @@ class Navigation extends Component {
 const styles = {
   containerStyle: {
     flexDirection: 'row',
-    paddingTop: 20,
     backgroundColor: 'white',
-    paddingBottom: 20,
-    paddingLeft: 15,
-    paddingRight: 15,
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingRight: 3,
+    paddingLeft: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -47,7 +51,8 @@ const styles = {
   },
   infoStyle: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    padding: 12
   },
   rightInfoTextStyle: {
     fontSize: 16,
