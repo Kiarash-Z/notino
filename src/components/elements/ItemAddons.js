@@ -1,11 +1,25 @@
 import React, { Component } from 'react';
-import { View, CameraRoll, TouchableNativeFeedback } from 'react-native';
+import { View,
+        CameraRoll,
+        TouchableNativeFeedback,
+        TimePickerAndroid,
+        DatePickerAndroid } from 'react-native';
+import PushNotification from 'react-native-push-notification';
 import { Icon } from '../common';
 
+PushNotification.configure({
+  onNotification(notification) {
+        console.log('NOTIFICATION:', notification);
+    }
+});
 class ItemAddons extends Component {
     constructor(props) {
       super(props);
       this.addImage = this.addImage.bind(this);
+      this.state = {
+        alarmSetted: false
+      };
+      this.handleAlarm = this.handleAlarm.bind(this);
     }
     addImage() {
       CameraRoll.getPhotos({
@@ -16,8 +30,50 @@ class ItemAddons extends Component {
         this.props.addImage(r.edges);
       });
     }
+    handleAlarm() {
+      if (!this.state.alarmSetted) {
+        DatePickerAndroid.open().then(({ action, year, month, day }) => {
+          if (action === 'dateSetAction') {
+            TimePickerAndroid.open().then(({ action, hour, minute }) => {
+              if (action === 'timeSetAction') {
+                PushNotification.localNotificationSchedule({
+                  title: 'Test title',
+                  message: 'test message goes here',
+                  id: '0',
+                  date: new Date(year, month, day, hour, minute)
+                });
+                this.setState({
+                  alarmSetted: true
+                });
+              }
+            });
+          }
+        });
+      } else {
+        PushNotification.cancelLocalNotifications({ id: '0' });
+        this.setState({
+          alarmSetted: false
+        });
+      }
+    }
+
     render() {
       const { containerStyle, circleStyle, touchableStyle } = styles;
+      const renderAlarmIcon = () => {
+        if (this.state.alarmSetted) {
+          return (
+            <View>
+              <View style={circleStyle} />
+              <Icon name="alarm" size={21} color="#7b75f9" />
+            </View>
+          );
+        }
+        return (
+          <View>
+            <Icon name="alarm" size={21} color="#7b75f9" />
+          </View>
+        );
+      };
       return (
         <View style={containerStyle}>
               <TouchableNativeFeedback
@@ -32,7 +88,6 @@ class ItemAddons extends Component {
 
             <TouchableNativeFeedback
               onPress={this.props.addLocation}
-              underlayColor="rgba(0,0,0,.026)"
             >
               <View style={touchableStyle}>
                   <Icon name="makan" size={21} color="#7b75f9" />
@@ -40,14 +95,10 @@ class ItemAddons extends Component {
             </TouchableNativeFeedback>
 
             <TouchableNativeFeedback
-              onPress={() => true}
-              underlayColor="rgba(0,0,0,.026)"
+              onPress={this.handleAlarm}
             >
               <View style={touchableStyle}>
-                <View>
-                  <View style={circleStyle} />
-                  <Icon name="alarm" size={21} color="#7b75f9" />
-                </View>
+                {renderAlarmIcon()}
               </View>
 
             </TouchableNativeFeedback>

@@ -131,11 +131,17 @@ dependencies {
     compile "com.android.support:appcompat-v7:23.0.1"
     compile "com.facebook.react:react-native:+"  // From node_modules
     compile project(':react-native-image-picker')
-    compile project(':react-native-maps')
     compile project(':react-native-svg')
     compile project(':react-native-audio')
     compile project(':react-native-sound')
     compile project(':react-native-fs')
+    compile project(':react-native-push-notification')
+    compile project(':react-native-maps')
+    compile ('com.google.android.gms:play-services-gcm:+') {
+        force = true;
+    }
+      compile "com.google.android.gms:play-services-base:+"
+      compile "com.google.android.gms:play-services-maps:+"
 }
 
 // Run this once to be able to run the application with BUCK

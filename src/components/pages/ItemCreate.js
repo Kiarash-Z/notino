@@ -446,7 +446,7 @@ class ItemCreate extends Component {
             };
             return (
               <TouchableNativeFeedback
-                background={TouchableNativeFeedback.SelectableBackground()} 
+                background={TouchableNativeFeedback.SelectableBackground()}
                 onLongPress={() => {
                 this.setState({
                   itemRemove: item,
