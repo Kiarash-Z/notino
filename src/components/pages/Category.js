@@ -12,7 +12,7 @@ class Category extends Component {
     const { title, fileTypes, shortDescription } = item;
     const extractedFileTypes = fileTypes.map(type => type.value);
     return (
-      <TouchableNativeFeedback>
+      <TouchableNativeFeedback onPress={() => Actions.itemCreate({ item })}>
         <View>
           <ItemSection>
             <ListItem icons={extractedFileTypes} title={title}>

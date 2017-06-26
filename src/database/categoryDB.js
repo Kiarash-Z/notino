@@ -65,6 +65,18 @@ categoryDB.write(() => {
     color: '#34495e',
     active: false
   });
+  categoryDB.create('Item', {
+    title: 'مطالعه کتاب',
+    shortDescription: 'خوندن کتاب هوش عاطفی',
+    id: String(new Date().getTime()),
+    category: 'ورزشی',
+    link: 'example.com',
+    images: [categoryDB.create('primitiveStr', { value: 'l' })],
+    alarmSetted: false,
+    location: 'safddsadas',
+    voices: [categoryDB.create('primitiveStr', { value: 'gfl' })],
+    fileTypes: [categoryDB.create('primitiveStr', { value: 'motalee' })]
+  });
 });
 
 

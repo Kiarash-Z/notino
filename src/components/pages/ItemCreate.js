@@ -3,7 +3,6 @@ import { View,
         Image,
         TouchableHighlight,
         FlatList, ScrollView,
-        Picker,
         Animated,
         Text,
         StyleSheet,
@@ -21,8 +20,10 @@ import RNFS from 'react-native-fs';
 import MapView, { Marker } from 'react-native-maps';
 import Modal from 'react-native-simple-modal';
 import { Actions } from 'react-native-router-flux';
-import { Navigation, Input, ItemSection, Icon } from '../common';
+import { Navigation, Icon } from '../common';
 import ItemAddons from '../elements/ItemAddons';
+import categoryDB from '../../database/categoryDB';
+import ItemForm from '../elements/ItemForm';
 
 const ImagePickerOptions = {
   title: 'Select Image',
@@ -40,7 +41,6 @@ class ItemCreate extends Component {
       images: [],
       showGallerySelector: false,
       showImageModal: false,
-      selectedInput: 'ورزشی',
       openedImage: { node: { image: { uri: ' ', width: 0, height: 0 } } },
       marker: { coordinate: { latitude: 35.6892, longitude: 51.3890 } },
       showMapModal: false,
@@ -480,8 +480,7 @@ class ItemCreate extends Component {
         }
       }
   render() {
-    const { sectionStyle,
-            selectingImageContainer,
+    const { selectingImageContainer,
             openedImageStyle,
             imageModalStyle,
             markerStyle,
@@ -585,44 +584,7 @@ class ItemCreate extends Component {
               onLeftButtonPress={() => Actions.pop()}
             />
           <ScrollView>
-            <View style={{ paddingRight: 10 }}>
-              <ItemSection style={{ ...sectionStyle, borderTopWidth: 0 }}>
-                <Input
-                  align="right"
-                  placeholder="تیتر"
-                  bordered
-                  size={15}
-                />
-              </ItemSection>
-
-              <ItemSection style={sectionStyle}>
-                <Input
-                  align="right"
-                  placeholder="توضیح کوتاه"
-                  bordered
-                  size={15}
-                />
-              </ItemSection>
-
-              <ItemSection style={sectionStyle}>
-                <Picker
-                selectedValue={this.state.selectedInput}
-                onValueChange={(itemValue) => this.setState({ selectedInput: itemValue })}
-                >
-                  <Picker.Item label="ورزشی" value="varzeshi" />
-                  <Picker.Item label="مطالعه" value="motalee" />
-                </Picker>
-              </ItemSection>
-
-              <ItemSection style={sectionStyle}>
-                <Input
-                  align="right"
-                  placeholder="لینک"
-                  bordered
-                  size={15}
-                />
-              </ItemSection>
-            </View>
+            <ItemForm item={this.props.item} />
             <FlatList
                 data={this.state.itemsToBeRendered}
                 renderItem={this.renderAllItems}
@@ -737,11 +699,6 @@ const shadowOpt = {
 	style: { marginVertical: 5 }
 };
 const styles = {
-  sectionStyle: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    borderTopColor: 'rgba(0,0,0,.07)'
-  },
   bottomContainerStyle: {
     position: 'relative',
     flex: 1
