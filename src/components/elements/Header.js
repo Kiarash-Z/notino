@@ -8,8 +8,8 @@ class Header extends Component {
     return (
       <View style={containerStyle}>
         <View style={titleContainerStyle}>
-          <Text style={titleStyle}>ورزشی</Text>
-          <Icon name="varzeshi" size={35} color="#329ff4" />
+          <Text style={titleStyle}>{this.props.title}</Text>
+          <Icon name={this.props.icon} size={35} color={this.props.color} />
         </View>
         <Text style={subTitle}>لیست یادداشت های من</Text>
       </View>
@@ -34,6 +34,7 @@ const styles = {
   },
   titleStyle: {
     fontSize: 40,
+    marginRight: 10,
     color: 'rgba(0,0,0, .8)',
     fontFamily: 'IS_Reg'
   }

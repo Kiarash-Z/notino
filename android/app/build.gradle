@@ -136,6 +136,7 @@ dependencies {
     compile project(':react-native-sound')
     compile project(':react-native-fs')
     compile project(':react-native-push-notification')
+    compile project(':realm')
     compile project(':react-native-maps')
     compile ('com.google.android.gms:play-services-gcm:+') {
         force = true;
