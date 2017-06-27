@@ -5,6 +5,8 @@
     "no-param-reassign": 0,
     "no-unused-expressions": 0,
     "default-case": 0,
-    "prefer-template": 0
+    "prefer-template": 0,
+    "new-parens": 0,
+    "array-callback-return": 0
   }
 }

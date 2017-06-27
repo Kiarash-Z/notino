@@ -7,14 +7,11 @@ import { View,
         Text,
         StyleSheet,
         TouchableWithoutFeedback,
-        LayoutAnimation,
         Vibration,
-        TouchableNativeFeedback,
-        UIManager } from 'react-native';
-import GestureRecognizer from 'react-native-swipe-gestures';
+        TouchableNativeFeedback } from 'react-native';
+
 import { AudioRecorder, AudioUtils } from 'react-native-audio';
 import { BoxShadow } from 'react-native-shadow';
-import ImagePicker from 'react-native-image-picker';
 import Sound from 'react-native-sound';
 import RNFS from 'react-native-fs';
 import MapView, { Marker } from 'react-native-maps';
@@ -24,14 +21,8 @@ import { Navigation, Icon } from '../common';
 import ItemAddons from '../elements/ItemAddons';
 import categoryDB from '../../database/categoryDB';
 import ItemForm from '../elements/ItemForm';
+import BottomContainer from '../elements/BottomContainer';
 
-const ImagePickerOptions = {
-  title: 'Select Image',
-  storageOptions: {
-    skipBackup: true,
-    path: 'images'
-  }
-};
 
 class ItemCreate extends Component {
   constructor(props) {
@@ -44,8 +35,6 @@ class ItemCreate extends Component {
       openedImage: { node: { image: { uri: ' ', width: 0, height: 0 } } },
       marker: { coordinate: { latitude: 35.6892, longitude: 51.3890 } },
       showMapModal: false,
-      recordVoiceTime: 0,
-      recordingVoiceStat: 'stopped',
       voicePathCounter: 1,
       timelineWidth: 0,
       playingVoice: '',
@@ -54,16 +43,8 @@ class ItemCreate extends Component {
       itemRemove: null,
       imageModalWidth: 0
     };
-    // enable animation
-
-    UIManager.setLayoutAnimationEnabledExperimental &&
-    UIManager.setLayoutAnimationEnabledExperimental(true);
     // bindings
-
-    this.addImage = this.addImage.bind(this);
-    this.renderImages = this.renderImages.bind(this);
     this.renderAllItems = this.renderAllItems.bind(this);
-    this.imageContainerSwipeUp = this.imageContainerSwipeUp.bind(this);
     this.openImageModal = this.openImageModal.bind(this);
     this.removeImage = this.removeImage.bind(this);
     this.handleMapPress = this.handleMapPress.bind(this);
@@ -105,21 +86,7 @@ class ItemCreate extends Component {
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
     );
 }
-  // open gallery on swipe
-  imageContainerSwipeUp() {
-    ImagePicker.showImagePicker(ImagePickerOptions, (response) => {
-      if (response.didCancel || response.error || response.customButton) {
-        return false;
-      }
-      this.setState({
-        itemsToBeRendered: [
-                ...this.state.itemsToBeRendered,
-                { type: 'image', node: { image: { uri: response.uri } } }
-              ],
-            showGallerySelector: false
-            });
-      });
-  }
+
   itemsKeyExtractor(item) {
     switch (item.type) {
       case 'image':
@@ -154,13 +121,6 @@ class ItemCreate extends Component {
       itemsToBeRendered: updatedState
     });
   }
-  addImage(images) {
-    LayoutAnimation.easeInEaseOut();
-    this.setState({
-      images,
-      showGallerySelector: !this.state.showGallerySelector
-    });
-  }
 
   handleMapPress(e) {
     this.setState({
@@ -170,36 +130,6 @@ class ItemCreate extends Component {
     });
   }
 
-  // this will render images from gallery
-
-  renderImages({ item }) {
-      return (
-        <TouchableHighlight
-          onPress={() => {
-            // checks for duplication
-            const checkDuplicate = this.state.itemsToBeRendered.filter((i) => {
-              if (i.type === 'image') {
-                return i.node.image.uri === item.node.image.uri;
-              }
-              return false;
-            });
-            if (checkDuplicate.length > 0) {
-              return false;
-            }
-            this.setState({
-              itemsToBeRendered: [...this.state.itemsToBeRendered, { ...item, type: 'image' }],
-              showGallerySelector: false
-            });
-            }}
-          underlayColor='transparent'
-        >
-        <Image
-          style={styles.selectingImagesStyle}
-          source={{ uri: item.node.image.uri }}
-        />
-      </TouchableHighlight>
-    );
-  }
   addLocation() {
     this.setState({
       showMapModal: true,
@@ -495,18 +425,7 @@ class ItemCreate extends Component {
             removeModalQuesStyle,
             removeModalTextContainerStyle,
             imageModalTextStyle } = styles;
-    const showImages = () => {
-      if (this.state.showGallerySelector) {
-        return (
-          <FlatList
-              data={this.state.images}
-              renderItem={this.renderImages}
-              keyExtractor={item => item.node.image.uri}
-              horizontal
-          />
-        );
-      }
-    };
+
     const openedImage = this.state.openedImage.node.image;
     const showMapPoint = () => {
       if (Object.keys(this.state.marker).length !== 0) {
@@ -541,28 +460,7 @@ class ItemCreate extends Component {
         </TouchableWithoutFeedback>
       );
     };
-    const showRecordingVoice = () => {
-      const formatSeconds = (totalSeconds) => {
-        let seconds = totalSeconds % 60;
-        let minutes = (totalSeconds - seconds) / 60;
-        if (seconds < 10) {
-          seconds = `0${seconds}`;
-        }
-        if (minutes < 10) {
-          minutes = `0${minutes}`;
-        }
-        return `${minutes}:${seconds}`;
-      };
-      if (this.state.recordingVoiceStat === 'started') {
-        return (
-          <View style={recorderContainerStyle}>
-            <Text style={recorderTimerStyle}>
-              {formatSeconds(this.state.recordVoiceTime)}
-            </Text>
-          </View>
-        );
-      }
-    };
+
     const imageModalHeight = () => {
       const width = openedImage.width;
       const height = openedImage.height;
@@ -592,19 +490,11 @@ class ItemCreate extends Component {
                 style={{ backgroundColor: 'white' }}
             />
           </ScrollView>
-          <View style={bottomContainerStyle}>
-            <View style={selectingImageContainer}>
-              <GestureRecognizer onSwipeUp={this.imageContainerSwipeUp}>
-                  {showImages()}
-              </GestureRecognizer>
-              </View>
-              {showRecordingVoice()}
-          </View>
+          <BottomContainer />
           <ItemAddons
             startRecordingVoice={this.startRecordingVoice}
             saveVoice={this.saveVoice}
             addLocation={this.addLocation}
-            addImage={this.addImage}
           />
         </View>
         <Modal
@@ -699,27 +589,7 @@ const shadowOpt = {
 	style: { marginVertical: 5 }
 };
 const styles = {
-  bottomContainerStyle: {
-    position: 'relative',
-    flex: 1
-  },
-  selectingImageContainer: {
-    paddingTop: 10,
-    paddingLeft: 10,
-    paddingRight: 10,
-    position: 'absolute',
-    bottom: -10,
-    left: 0,
-    right: 0,
-    backgroundColor: 'white'
-  },
-  selectingImagesStyle: {
-    marginBottom: 10,
-    width: 60,
-    height: 60,
-    borderRadius: 5,
-    marginRight: 15
-  },
+
   imageStyle: {
     flex: 1,
     height: 70,
@@ -797,21 +667,7 @@ const styles = {
     fontSize: 15,
     marginBottom: 5
   },
-  recorderContainerStyle: {
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'white',
-    paddingBottom: 10,
-    paddingTop: 10
-  },
-  recorderTimerStyle: {
-    fontFamily: 'IS_Med',
-    color: '#e74c3c',
-    fontSize: 18
-  },
+
   voiceContainerStyle: {
     paddingTop: 15,
     paddingBottom: 15,

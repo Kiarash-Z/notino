@@ -9,7 +9,7 @@ export default {
       link: 'string',
       images: {
         type: 'list',
-        objectType: 'primitiveStr'
+        objectType: 'Image'
       },
       alarmSetted: 'bool',
       location: 'string',

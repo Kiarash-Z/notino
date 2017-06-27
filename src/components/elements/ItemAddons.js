@@ -3,8 +3,11 @@ import { View,
         CameraRoll,
         TouchableNativeFeedback,
         TimePickerAndroid,
+        LayoutAnimation,
+        UIManager,
         DatePickerAndroid } from 'react-native';
 import PushNotification from 'react-native-push-notification';
+import { inject, observer } from 'mobx-react';
 import { Icon } from '../common';
 
 PushNotification.configure({
@@ -12,6 +15,8 @@ PushNotification.configure({
         console.log('NOTIFICATION:', notification);
     }
 });
+@inject('itemStore')
+@observer
 class ItemAddons extends Component {
     constructor(props) {
       super(props);
@@ -20,14 +25,34 @@ class ItemAddons extends Component {
         alarmSetted: false
       };
       this.handleAlarm = this.handleAlarm.bind(this);
+      UIManager.setLayoutAnimationEnabledExperimental &&
+      UIManager.setLayoutAnimationEnabledExperimental(true);
     }
     addImage() {
+      const { itemStore } = this.props;
       CameraRoll.getPhotos({
         first: 25,
         assetType: 'All'
       })
       .then(r => {
-        this.props.addImage(r.edges);
+        const organizeImages = () => {
+          const organized = [];
+          r.edges.map(pic => {
+            organized.push({
+              type: 'image',
+              uri: pic.node.image.uri,
+              width: pic.node.image.width,
+              height: pic.node.image.height
+            });
+          });
+          return organized;
+        };
+        LayoutAnimation.easeInEaseOut();
+        itemStore.updateValue({ prop: 'galleryImages', value: organizeImages() });
+        itemStore.updateValue({
+          prop: 'showGallerySelector',
+          value: !itemStore.showGallerySelector
+         });
       });
     }
     handleAlarm() {

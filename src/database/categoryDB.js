@@ -1,6 +1,7 @@
 import Realm from 'realm';
 import uuidV4 from 'uuid/v4';
 import itemDB from './itemDB';
+import { imageDB } from './typesDB';
 
 const categoryDB = new Realm({ schema: [{
     name: 'Category',
@@ -20,6 +21,7 @@ const categoryDB = new Realm({ schema: [{
     }
   },
   itemDB,
+  imageDB,
   {
     name: 'primitiveStr',
     properties: {
@@ -71,7 +73,6 @@ categoryDB.write(() => {
     id: String(new Date().getTime()),
     category: 'ورزشی',
     link: 'example.com',
-    images: [categoryDB.create('primitiveStr', { value: 'l' })],
     alarmSetted: false,
     location: 'safddsadas',
     voices: [categoryDB.create('primitiveStr', { value: 'gfl' })],
