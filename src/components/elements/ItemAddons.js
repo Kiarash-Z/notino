@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { View,
-        CameraRoll,
         TouchableNativeFeedback,
         TimePickerAndroid,
-        LayoutAnimation,
         UIManager,
         DatePickerAndroid } from 'react-native';
 import PushNotification from 'react-native-push-notification';
@@ -15,12 +13,11 @@ PushNotification.configure({
         console.log('NOTIFICATION:', notification);
     }
 });
-@inject('itemStore')
+@inject('itemStore', 'itemImageStore', 'itemVoiceStore')
 @observer
 class ItemAddons extends Component {
     constructor(props) {
       super(props);
-      this.addImage = this.addImage.bind(this);
       this.state = {
         alarmSetted: false
       };
@@ -28,50 +25,26 @@ class ItemAddons extends Component {
       UIManager.setLayoutAnimationEnabledExperimental &&
       UIManager.setLayoutAnimationEnabledExperimental(true);
     }
-    addImage() {
-      const { itemStore } = this.props;
-      CameraRoll.getPhotos({
-        first: 25,
-        assetType: 'All'
-      })
-      .then(r => {
-        const organizeImages = () => {
-          const organized = [];
-          r.edges.map(pic => {
-            organized.push({
-              type: 'image',
-              uri: pic.node.image.uri,
-              width: pic.node.image.width,
-              height: pic.node.image.height
-            });
-          });
-          return organized;
-        };
-        LayoutAnimation.easeInEaseOut();
-        itemStore.updateValue({ prop: 'galleryImages', value: organizeImages() });
-        itemStore.updateValue({
-          prop: 'showGallerySelector',
-          value: !itemStore.showGallerySelector
-         });
-      });
-    }
     handleAlarm() {
       if (!this.state.alarmSetted) {
+        const openTimePicker = (year, month, day) => {
+          TimePickerAndroid.open().then(({ action, hour, minute }) => {
+            if (action === 'timeSetAction') {
+              PushNotification.localNotificationSchedule({
+                title: 'Test title',
+                message: 'test message goes here',
+                id: '0',
+                date: new Date(year, month, day, hour, minute)
+              });
+              this.setState({
+                alarmSetted: true
+              });
+            }
+          });
+        };
         DatePickerAndroid.open().then(({ action, year, month, day }) => {
           if (action === 'dateSetAction') {
-            TimePickerAndroid.open().then(({ action, hour, minute }) => {
-              if (action === 'timeSetAction') {
-                PushNotification.localNotificationSchedule({
-                  title: 'Test title',
-                  message: 'test message goes here',
-                  id: '0',
-                  date: new Date(year, month, day, hour, minute)
-                });
-                this.setState({
-                  alarmSetted: true
-                });
-              }
-            });
+            openTimePicker(year, month, day);
           }
         });
       } else {
@@ -84,6 +57,7 @@ class ItemAddons extends Component {
 
     render() {
       const { containerStyle, circleStyle, touchableStyle } = styles;
+      const { itemImageStore, itemVoiceStore } = this.props;
       const renderAlarmIcon = () => {
         if (this.state.alarmSetted) {
           return (
@@ -102,8 +76,8 @@ class ItemAddons extends Component {
       return (
         <View style={containerStyle}>
               <TouchableNativeFeedback
-                onPressIn={this.props.startRecordingVoice}
-                onPressOut={this.props.saveVoice}
+                onPressIn={() => itemVoiceStore.startRecordingVoice()}
+                onPressOut={() => itemVoiceStore.saveVoice()}
                 background={TouchableNativeFeedback.SelectableBackground()}
               >
                 <View style={touchableStyle}>
@@ -128,7 +102,7 @@ class ItemAddons extends Component {
 
             </TouchableNativeFeedback>
             <TouchableNativeFeedback
-              onPress={this.addImage}
+              onPress={() => itemImageStore.addImage()}
               underlayColor="rgba(0,0,0,.026)"
             >
               <View style={touchableStyle}>

@@ -2,74 +2,45 @@ import React, { Component } from 'react';
 import { View, FlatList, Text, TouchableHighlight, Image } from 'react-native';
 import { inject, observer } from 'mobx-react';
 import GestureRecognizer from 'react-native-swipe-gestures';
-import ImagePicker from 'react-native-image-picker';
 
-@inject('itemStore')
+
+@inject('itemStore', 'itemImageStore', 'itemVoiceStore')
 @observer
 class BottomContainer extends Component {
-  constructor(props) {
-    super(props);
-    this.imageContainerSwipeUp = this.imageContainerSwipeUp.bind(this);
-    this.renderImages = this.renderImages.bind(this);
-  }
-  imageContainerSwipeUp() {
-    const ImagePickerOptions = {
-      title: 'Select Image',
-      storageOptions: {
-        skipBackup: true,
-        path: 'images'
-      }
-    };
-    const { itemStore } = this.props;
-    ImagePicker.showImagePicker(ImagePickerOptions, (response) => {
-      const checkDuplicate = itemStore.images.filter((i) => {
-          return i.uri === response.uri;
-      });
-      if (response.didCancel ||
-          response.error ||
-          response.customButton ||
-          checkDuplicate.length > 0) {
-        return false;
-      }
-      itemStore.updateValue({ prop: 'showGallerySelector', value: !itemStore.showGallerySelector });
-      itemStore.addImage({ uri: response.uri, width: response.width, height: response.height });
-      });
-  }
-  renderImages({ item }) {
-    const { itemStore } = this.props;
-      return (
-        <TouchableHighlight
-          onPress={() => {
-            // checks for duplication
-            const checkDuplicate = itemStore.images.filter((i) => {
-                return i.uri === item.uri;
-            });
-            if (checkDuplicate.length === 0) {
-              itemStore.updateValue({ prop: 'showGallerySelector', value: false });
-              itemStore.addImage({ ...item });
-            }
-            }}
-          underlayColor='transparent'
-        >
-        <Image
-          style={styles.selectingImagesStyle}
-          source={{ uri: item.uri }}
-        />
-      </TouchableHighlight>
-    );
-  }
   render() {
     const { bottomContainerStyle,
             selectingImageContainer,
             recorderContainerStyle,
             recorderTimerStyle } = styles;
-    const { itemStore } = this.props;
+    const { itemImageStore, itemStore, itemVoiceStore } = this.props;
+    const renderImages = ({ item }) => {
+        return (
+          <TouchableHighlight
+            onPress={() => {
+              console.log(Array.prototype.slice.call(itemStore.images));
+              const checkDuplicate = itemStore.images.filter((i) => {
+                  return i.uri === item.uri;
+              });
+              if (checkDuplicate.length === 0) {
+                itemImageStore.showGallerySelector = false;
+                itemImageStore.mapImageToState({ ...item });
+              }
+              }}
+            underlayColor='transparent'
+          >
+          <Image
+            style={styles.selectingImagesStyle}
+            source={{ uri: item.uri }}
+          />
+        </TouchableHighlight>
+      );
+    };
     const showImages = () => {
-      if (itemStore.showGallerySelector) {
+      if (itemImageStore.showGallerySelector) {
         return (
           <FlatList
-              data={itemStore.galleryImages}
-              renderItem={this.renderImages}
+              data={itemImageStore.galleryImages}
+              renderItem={renderImages}
               keyExtractor={item => item.uri}
               horizontal
           />
@@ -88,11 +59,12 @@ class BottomContainer extends Component {
         }
         return `${minutes}:${seconds}`;
       };
-      if (itemStore.recordingVoiceStat === 'started') {
+      if (itemVoiceStore.recordingVoiceStat === 'started') {
+        itemVoiceStore.startVoiceTimer();
         return (
           <View style={recorderContainerStyle}>
             <Text style={recorderTimerStyle}>
-              {formatSeconds(itemStore.recordVoiceTime)}
+              {formatSeconds(itemVoiceStore.recordingVoiceTime)}
             </Text>
           </View>
         );
@@ -101,7 +73,7 @@ class BottomContainer extends Component {
     return (
       <View style={bottomContainerStyle}>
         <View style={selectingImageContainer}>
-          <GestureRecognizer onSwipeUp={this.imageContainerSwipeUp}>
+          <GestureRecognizer onSwipeUp={() => itemImageStore.imageContainerSwipeUp()}>
               {showImages()}
           </GestureRecognizer>
           </View>

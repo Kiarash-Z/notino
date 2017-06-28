@@ -7,13 +7,6 @@ import categoryDB from '../../database/categoryDB';
 @inject('itemStore')
 @observer
 class ItemForm extends Component {
-  componentWillMount() {
-    const { item, itemStore } = this.props;
-    const properties = Object.keys(item);
-    properties.forEach(property => {
-      itemStore.updateValue({ prop: property, value: item[property] });
-    });
-  }
   render() {
     const { itemStore } = this.props;
     const { title, shortDescription, category, link } = itemStore;

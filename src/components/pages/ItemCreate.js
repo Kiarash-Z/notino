@@ -7,13 +7,10 @@ import { View,
         Text,
         StyleSheet,
         TouchableWithoutFeedback,
-        Vibration,
         TouchableNativeFeedback } from 'react-native';
 
-import { AudioRecorder, AudioUtils } from 'react-native-audio';
+import { inject, observer } from 'mobx-react';
 import { BoxShadow } from 'react-native-shadow';
-import Sound from 'react-native-sound';
-import RNFS from 'react-native-fs';
 import MapView, { Marker } from 'react-native-maps';
 import Modal from 'react-native-simple-modal';
 import { Actions } from 'react-native-router-flux';
@@ -23,7 +20,8 @@ import categoryDB from '../../database/categoryDB';
 import ItemForm from '../elements/ItemForm';
 import BottomContainer from '../elements/BottomContainer';
 
-
+@inject('itemStore')
+@observer
 class ItemCreate extends Component {
   constructor(props) {
     super(props);
@@ -35,7 +33,6 @@ class ItemCreate extends Component {
       openedImage: { node: { image: { uri: ' ', width: 0, height: 0 } } },
       marker: { coordinate: { latitude: 35.6892, longitude: 51.3890 } },
       showMapModal: false,
-      voicePathCounter: 1,
       timelineWidth: 0,
       playingVoice: '',
       showRemoveModal: false,
@@ -46,29 +43,14 @@ class ItemCreate extends Component {
     // bindings
     this.renderAllItems = this.renderAllItems.bind(this);
     this.openImageModal = this.openImageModal.bind(this);
-    this.removeImage = this.removeImage.bind(this);
     this.handleMapPress = this.handleMapPress.bind(this);
     this.addLocation = this.addLocation.bind(this);
     this.addMapToList = this.addMapToList.bind(this);
     this.removeMap = this.removeMap.bind(this);
-    this.startRecordingVoice = this.startRecordingVoice.bind(this);
-    this.startVoiceTimer = this.startVoiceTimer.bind(this);
-    this.saveVoice = this.saveVoice.bind(this);
     this.playAndPauseVoice = this.playAndPauseVoice.bind(this);
     this.getVoiceLayout = this.getVoiceLayout.bind(this);
     this.progressTimeline = this.progressTimeline.bind(this);
-    this.removeVoice = this.removeVoice.bind(this);
     this.removeModal = this.removeModal.bind(this);
-  }
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState !== this.state) {
-      switch (this.state.recordingVoiceStat) {
-        case 'started':
-          this.startVoiceTimer();
-          break;
-        default:
-      }
-    }
   }
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(
@@ -85,6 +67,24 @@ class ItemCreate extends Component {
       (err) => console.log('could not get location', err),
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
     );
+}
+componentWillMount() {
+  const { item, itemStore } = this.props;
+  const deepClone = JSON.parse(JSON.stringify(item));
+  const properties = Object.keys(deepClone);
+  properties.forEach(property => {
+    // convert to arr
+    if (property === 'images' || property === 'voices' || property === 'fileTypes') {
+      const arr = [];
+      Object.keys(deepClone[property]).forEach(key => {
+        arr.push(deepClone[property][key]);
+        console.log(arr);
+        itemStore.updateValue({ prop: property, value: arr });
+      });
+    } else {
+      itemStore.updateValue({ prop: property, value: deepClone[property] });
+    }
+  });
 }
 
   itemsKeyExtractor(item) {
@@ -103,15 +103,7 @@ class ItemCreate extends Component {
       this.setState({ showImageModal: true, openedImage: image });
   }
   // this func will remove image
-  removeImage(uri) {
-    const selectedImages = this.state.itemsToBeRendered.filter((item) => {
-      if (item.type !== 'image') {
-        return true;
-      }
-      return item.node.image.uri !== uri;
-    });
-    this.setState({ itemsToBeRendered: selectedImages });
-  }
+
   // this will show up images section on icon press
   removeMap() {
     const updatedState = this.state.itemsToBeRendered.filter((item) => {
@@ -166,58 +158,7 @@ class ItemCreate extends Component {
     }
   }
 
-  startRecordingVoice() {
-      Vibration.vibrate([0, 50, 25, 0]);
-      const path = `${AudioUtils.DocumentDirectoryPath}/voice${this.state.voicePathCounter}.aac`;
-      AudioRecorder.prepareRecordingAtPath(path, {
-        SampleRate: 22050,
-        Channels: 1,
-        AudioQuality: 'Low',
-        AudioEncoding: 'aac'
-      });
-      AudioRecorder.startRecording();
-      this.setState({
-        showGallerySelector: false,
-        recordingVoiceStat: 'started'
-      });
-  }
-  startVoiceTimer() {
-    this.voiceTimer = setTimeout(() => {
-      const newCount = this.state.recordVoiceTime + 1;
-      this.setState({ recordVoiceTime: newCount });
-    }, 1000);
-  }
-  saveVoice() {
-    Vibration.vibrate([0, 50, 25, 0]);
-    const that = this;
-    const path = `${AudioUtils.DocumentDirectoryPath}/voice${this.state.voicePathCounter}.aac`;
-    AudioRecorder.stopRecording();
-    clearInterval(this.voiceTimer);
-    this.setState({
-      recordVoiceTime: 0,
-      recordingVoiceStat: 'stopped'
-    });
-    const sound = new Sound(path, Sound.MAIN_BUNDLE, (error) => {
-              if (error) {
-                  console.log('failed to load the sound', error);
-              } else if (sound.getDuration() >= 1) {
-                that.setState({
-                  itemsToBeRendered: [
-                    ...that.state.itemsToBeRendered,
-                    {
-                      type: 'voice',
-                      duration: sound.getDuration(),
-                      playingVoiceTime: new Animated.Value(0),
-                      status: 'stopped',
-                      id: that.state.voicePathCounter,
-                      sound
-                    }
-                  ],
-                  voicePathCounter: that.state.voicePathCounter + 1
-                });
-              }
-          });
-  }
+
   // this will render all items such as voice location alarm and images
 
   playAndPauseVoice(duration, id) {
@@ -261,20 +202,7 @@ class ItemCreate extends Component {
       this.setState({ itemsToBeRendered: updatedState('paused', 'started') });
     }
   }
-  removeVoice(id) {
-    const updatedState = this.state.itemsToBeRendered.filter(item => {
-      if (item.type !== 'voice') {
-        return true;
-      } else if (item.id === id) {
-        item.sound.stop();
-        return false;
-      }
-        return true;
-    });
-    const path = `${AudioUtils.DocumentDirectoryPath}/voice${id}.aac`;
-           this.setState({ itemsToBeRendered: updatedState });
-           RNFS.unlink(path);
-  }
+
   getVoiceLayout(e) {
     this.setState({
       timelineWidth: e.nativeEvent.layout.width
@@ -493,7 +421,6 @@ class ItemCreate extends Component {
           <BottomContainer />
           <ItemAddons
             startRecordingVoice={this.startRecordingVoice}
-            saveVoice={this.saveVoice}
             addLocation={this.addLocation}
           />
         </View>

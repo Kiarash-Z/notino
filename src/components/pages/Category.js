@@ -47,7 +47,7 @@ class Category extends Component {
             onRightButtonPress={() => Actions.categories()}
           />
           <Header title={type} icon={icon} color={color} />
-          <View style={[styles.noItemTextContainer, {display: displayNoItem}]}>
+          <View style={[styles.noItemTextContainer, { display: displayNoItem }]}>
             <Text style={styles.noItemTextStyle}>
               اولین آیتمو ایجاد کن!
             </Text>

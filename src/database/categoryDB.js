@@ -76,6 +76,8 @@ categoryDB.write(() => {
     alarmSetted: false,
     location: 'safddsadas',
     voices: [categoryDB.create('primitiveStr', { value: 'gfl' })],
+    images: [categoryDB.create('Image',
+    { type: 'image', uri: 'blank', width: 10, height: 10, timestamp: 9 })],
     fileTypes: [categoryDB.create('primitiveStr', { value: 'motalee' })]
   });
 });
