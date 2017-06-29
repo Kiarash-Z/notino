@@ -1,7 +1,7 @@
 import Realm from 'realm';
 import uuidV4 from 'uuid/v4';
 import itemDB from './itemDB';
-import { imageDB } from './typesDB';
+import { imageDB, markerDB, VoiceDB } from './typesDB';
 
 const categoryDB = new Realm({ schema: [{
     name: 'Category',
@@ -22,6 +22,8 @@ const categoryDB = new Realm({ schema: [{
   },
   itemDB,
   imageDB,
+  VoiceDB,
+  markerDB,
   {
     name: 'primitiveStr',
     properties: {
@@ -66,19 +68,6 @@ categoryDB.write(() => {
     icon: 'shakhsi',
     color: '#34495e',
     active: false
-  });
-  categoryDB.create('Item', {
-    title: 'مطالعه کتاب',
-    shortDescription: 'خوندن کتاب هوش عاطفی',
-    id: String(new Date().getTime()),
-    category: 'ورزشی',
-    link: 'example.com',
-    alarmSetted: false,
-    location: 'safddsadas',
-    voices: [categoryDB.create('primitiveStr', { value: 'gfl' })],
-    images: [categoryDB.create('Image',
-    { type: 'image', uri: 'blank', width: 10, height: 10, timestamp: 9 })],
-    fileTypes: [categoryDB.create('primitiveStr', { value: 'motalee' })]
   });
 });
 

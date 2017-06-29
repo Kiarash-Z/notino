@@ -5,8 +5,12 @@ import { itemStore } from './';
 
 class Image {
   @observable showGallerySelector = false;
-  @observable galleryImages = []
+  @observable galleryImages = [];
+  @observable showImageModal = false;
+  @observable openedImage = { uri: '', width: '', height: '' };
+  @observable imageModalWidth = 0;
   mapImageToState({ uri, width, height }) {
+    itemStore.fileTypes.push('picture');
     itemStore.images.push({
       uri,
       width,
@@ -59,11 +63,9 @@ class Image {
       this.mapImageToState({ uri: response.uri, width: response.width, height: response.height });
       });
   }
-  removeImage(timestamp) {
-    const selectedImages = itemStore.images.filter((item) => {
-      return item.timestamp !== timestamp;
-    });
-    itemStore.images = selectedImages;
+  openImageModal(image) {
+    this.showImageModal = true;
+    this.openedImage = image;
   }
 }
 

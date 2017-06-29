@@ -16,7 +16,7 @@ class ItemForm extends Component {
       .filter((item) => item.type !== 'همه')
       .map((item, index) => {
           return (
-            <Picker.item label={item.type} value={String(index)} key={index} />
+            <Picker.Item label={item.type} value={String(index)} key={index} />
           );
       });
     };
@@ -29,6 +29,7 @@ class ItemForm extends Component {
             bordered
             value={title}
             size={15}
+            maxLength={25}
             onChangeText={value => itemStore.updateValue({ prop: 'title', value })}
           />
         </ItemSection>
@@ -40,6 +41,7 @@ class ItemForm extends Component {
             bordered
             value={shortDescription}
             size={15}
+            maxLength={35}
             onChangeText={value => itemStore.updateValue({ prop: 'shortDescription', value })}
           />
         </ItemSection>

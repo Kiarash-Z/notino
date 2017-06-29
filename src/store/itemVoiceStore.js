@@ -9,12 +9,17 @@ class Voice {
   @observable recordingVoiceTime = 0;
   @observable recordingVoiceStat = 'stopped';
   @observable voicePathCounter = 1;
+  @observable timelineWidth = 0;
   startVoiceTimer() {
     this.voiceTimer = setTimeout(() => {
       this.recordingVoiceTime += 1;
     }, 1000);
   }
+  getVoiceLayout(e) {
+    this.timelineWidth = e.nativeEvent.layout.width;
+  }
   startRecordingVoice() {
+      this.recordingVoiceStat = 'started';
       Vibration.vibrate([0, 50, 25, 0]);
       const path = `${AudioUtils.DocumentDirectoryPath}/voice${this.voicePathCounter}.aac`;
       AudioRecorder.prepareRecordingAtPath(path, {
@@ -25,16 +30,15 @@ class Voice {
       });
       AudioRecorder.startRecording();
       itemImageStore.showGallerySelector = false;
-      this.recordingVoiceStat = 'started';
   }
   saveVoice() {
+    this.recordingVoiceTime = 0;
+    this.recordingVoiceStat = 'stopped';
+    clearInterval(this.voiceTimer);
     Vibration.vibrate([0, 50, 25, 0]);
     const that = this;
     const path = `${AudioUtils.DocumentDirectoryPath}/voice${this.voicePathCounter}.aac`;
     AudioRecorder.stopRecording();
-    this.recordingVoiceTime = 0;
-    this.recordingVoiceStat = 'stopped';
-    this.recordingVoiceTime = 0;
     const sound = new Sound(path, Sound.MAIN_BUNDLE, (error) => {
               if (error) {
                   console.log('failed to load the sound', error);
@@ -45,9 +49,11 @@ class Voice {
                   playingVoiceTime: new Animated.Value(0),
                   status: 'stopped',
                   timestamp: new Date().getTime(),
+                  pathNum: that.voicePathCounter,
                   sound
                 });
                 that.voicePathCounter += 1;
+                itemStore.fileTypes.push('voice');
               }
           });
   }
@@ -60,9 +66,57 @@ class Voice {
         return true;
     });
     const path = `${AudioUtils.DocumentDirectoryPath}/voice${pathNum}.aac`;
-           this.setState({ itemsToBeRendered: updatedState });
-           RNFS.unlink(path);
+    itemStore.voices = updatedState;
+    RNFS.unlink(path);
   }
+  playAndPauseVoice(duration, timestamp) {
+    const selectedVoice = itemStore.voices.filter(item => {
+      return item.timestamp === timestamp;
+    })[0];
+    const updatedState = (nextStatus, currentStatus) => {
+      return itemStore.voices.map((item) => {
+        if (item.timestamp === timestamp) {
+          item.status = nextStatus;
+            if (currentStatus === 'stopped') {
+            item.sound = item.sound.play();
+          } else {
+            item.sound = item.sound.pause();
+            item.playingVoiceTime.stopAnimation();
+          }
+        }
+        return item;
+      });
+    };
+    if (selectedVoice.status !== 'started') {
+      itemStore.voices = updatedState('started', 'stopped');
+      selectedVoice.sound.getCurrentTime(seconds => {
+        Animated.sequence([
+          Animated.timing(selectedVoice.playingVoiceTime, {
+            duration: (duration - seconds) * 1000,
+            toValue: 1,
+            Easing: 'linear'
+          }),
+          Animated.timing(selectedVoice.playingVoiceTime, {
+            duration: 0,
+            toValue: 0
+          })
+        ]).start(() => {
+          itemStore.voices = updatedState('stopped', 'started');
+        });
+      });
+    } else {
+      itemStore.voices = updatedState('paused', 'started');
+    }
+  }
+  progressTimeline(playingVoiceTime) {
+        const width = playingVoiceTime.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, this.timelineWidth]
+        });
+        return {
+          width
+        };
+    }
 }
 
 const itemVoiceStore = new Voice;

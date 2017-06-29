@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Provider } from 'mobx-react';
 import Router from './Router';
-import { itemStore, itemImageStore, itemVoiceStore } from './store';
+import { itemStore, itemImageStore, itemVoiceStore, itemLocationStore } from './store';
 
 
 class App extends Component {
@@ -11,6 +11,7 @@ class App extends Component {
             itemStore={itemStore}
             itemImageStore={itemImageStore}
             itemVoiceStore={itemVoiceStore}
+            itemLocationStore={itemLocationStore}
           >
             <Router />
           </Provider>

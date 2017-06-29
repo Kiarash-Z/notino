@@ -8,11 +8,17 @@ import ListItem from '../elements/ListItem';
 import categoryDB from '../../database/categoryDB';
 
 class Category extends Component {
+  componentWillMount() {
+    categoryDB.addListener('change', () => this.forceUpdate());
+  }
+  componentWillUnmount() {
+    categoryDB.removeListener('change', () => this.forceUpdate());
+  }
   renderItems({ item }) {
     const { title, fileTypes, shortDescription } = item;
     const extractedFileTypes = fileTypes.map(type => type.value);
     return (
-      <TouchableNativeFeedback onPress={() => Actions.itemCreate({ item })}>
+      <TouchableNativeFeedback onPress={() => Actions.itemEdit({ item })}>
         <View>
           <ItemSection>
             <ListItem icons={extractedFileTypes} title={title}>
@@ -27,13 +33,13 @@ class Category extends Component {
     const activeCat = categoryDB.objects('Category').find(cat => {
       return cat.active;
     });
+    const { type, icon, color } = activeCat;
     const relatedItems = categoryDB.objects('Item').filter(item => {
-      if (activeCat.type === 'همه') {
+      if (type === 'همه') {
         return true;
       }
-      return item.category === activeCat.type;
+      return item.category === type;
     });
-    const { type, icon, color } = activeCat;
     let displayNoItem = 'flex';
     if (relatedItems.length > 0) {
       displayNoItem = 'none';

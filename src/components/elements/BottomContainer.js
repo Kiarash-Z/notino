@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View, FlatList, Text, TouchableHighlight, Image } from 'react-native';
 import { inject, observer } from 'mobx-react';
 import GestureRecognizer from 'react-native-swipe-gestures';
-
+import { Icon } from '../common';
 
 @inject('itemStore', 'itemImageStore', 'itemVoiceStore')
 @observer
@@ -63,11 +63,14 @@ class BottomContainer extends Component {
         itemVoiceStore.startVoiceTimer();
         return (
           <View style={recorderContainerStyle}>
+            <Icon name="voice" size={21} color="#7b75f9" />
             <Text style={recorderTimerStyle}>
               {formatSeconds(itemVoiceStore.recordingVoiceTime)}
             </Text>
           </View>
         );
+      } else if (itemVoiceStore.recordingVoiceStat === 'stopped') {
+        clearInterval(this.voiceTimer);
       }
     };
     return (
@@ -110,7 +113,7 @@ const styles = {
   },
   recorderTimerStyle: {
     fontFamily: 'IS_Med',
-    color: '#e74c3c',
+    color: '#7b75f9',
     fontSize: 18
   },
   selectingImagesStyle: {

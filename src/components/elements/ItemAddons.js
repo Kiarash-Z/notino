@@ -1,76 +1,52 @@
 import React, { Component } from 'react';
-import { View,
-        TouchableNativeFeedback,
-        TimePickerAndroid,
-        UIManager,
-        DatePickerAndroid } from 'react-native';
-import PushNotification from 'react-native-push-notification';
+import { View, TouchableNativeFeedback, UIManager } from 'react-native';
 import { inject, observer } from 'mobx-react';
+// import PushNotification from 'react-native-push-notification';
 import { Icon } from '../common';
 
-PushNotification.configure({
-  onNotification(notification) {
-        console.log('NOTIFICATION:', notification);
-    }
-});
-@inject('itemStore', 'itemImageStore', 'itemVoiceStore')
+@inject('itemStore', 'itemImageStore', 'itemVoiceStore', 'itemLocationStore')
 @observer
 class ItemAddons extends Component {
-    constructor(props) {
-      super(props);
-      this.state = {
-        alarmSetted: false
-      };
-      this.handleAlarm = this.handleAlarm.bind(this);
+    componentDidMount() {
       UIManager.setLayoutAnimationEnabledExperimental &&
       UIManager.setLayoutAnimationEnabledExperimental(true);
     }
-    handleAlarm() {
-      if (!this.state.alarmSetted) {
-        const openTimePicker = (year, month, day) => {
-          TimePickerAndroid.open().then(({ action, hour, minute }) => {
-            if (action === 'timeSetAction') {
-              PushNotification.localNotificationSchedule({
-                title: 'Test title',
-                message: 'test message goes here',
-                id: '0',
-                date: new Date(year, month, day, hour, minute)
-              });
-              this.setState({
-                alarmSetted: true
-              });
-            }
-          });
-        };
-        DatePickerAndroid.open().then(({ action, year, month, day }) => {
-          if (action === 'dateSetAction') {
-            openTimePicker(year, month, day);
-          }
-        });
-      } else {
-        PushNotification.cancelLocalNotifications({ id: '0' });
-        this.setState({
-          alarmSetted: false
-        });
-      }
-    }
-
     render() {
       const { containerStyle, circleStyle, touchableStyle } = styles;
-      const { itemImageStore, itemVoiceStore } = this.props;
-      const renderAlarmIcon = () => {
-        if (this.state.alarmSetted) {
+      const { itemStore, itemImageStore, itemVoiceStore, itemLocationStore } = this.props;
+      // PushNotification.configure({
+      //   onNotification(notification) {
+      //         const clicked = notification.userInteraction;
+      //         if (clicked) {
+      //           itemStore.reminderSetted = false;
+      //         }
+      //     }
+      // });
+      const renderAlarm = () => {
+        if (itemStore.reminderSetted) {
           return (
-            <View>
-              <View style={circleStyle} />
-              <Icon name="alarm" size={21} color="#7b75f9" />
-            </View>
+            <TouchableNativeFeedback
+              onPress={() => { itemStore.addReminder(); }}
+            >
+              <View style={touchableStyle}>
+                <View>
+                  <View style={circleStyle} />
+                  <Icon name="alarm" size={21} color="#7b75f9" />
+                </View>
+              </View>
+            </TouchableNativeFeedback>
           );
         }
         return (
-          <View>
-            <Icon name="alarm" size={21} color="#7b75f9" />
-          </View>
+          <TouchableNativeFeedback
+            onPress={() => { itemStore.showReminderModal = true; }}
+          >
+            <View style={touchableStyle}>
+              <View>
+                <Icon name="alarm" size={21} color="#7b75f9" />
+              </View>
+            </View>
+          </TouchableNativeFeedback>
         );
       };
       return (
@@ -86,21 +62,13 @@ class ItemAddons extends Component {
               </TouchableNativeFeedback>
 
             <TouchableNativeFeedback
-              onPress={this.props.addLocation}
+              onPress={() => itemLocationStore.addLocation()}
             >
               <View style={touchableStyle}>
                   <Icon name="makan" size={21} color="#7b75f9" />
               </View>
             </TouchableNativeFeedback>
-
-            <TouchableNativeFeedback
-              onPress={this.handleAlarm}
-            >
-              <View style={touchableStyle}>
-                {renderAlarmIcon()}
-              </View>
-
-            </TouchableNativeFeedback>
+                {renderAlarm()}
             <TouchableNativeFeedback
               onPress={() => itemImageStore.addImage()}
               underlayColor="rgba(0,0,0,.026)"

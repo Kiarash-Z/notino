@@ -11,11 +11,12 @@ export default {
         type: 'list',
         objectType: 'Image'
       },
-      alarmSetted: 'bool',
-      location: 'string',
+      reminderSetted: 'bool',
+      reminderDate: 'string',
+      marker: { type: 'list', objectType: 'Marker' },
       voices: {
         type: 'list',
-        objectType: 'primitiveStr'
+        objectType: 'Voice'
       },
       fileTypes: {
         type: 'list',
