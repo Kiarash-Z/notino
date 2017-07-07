@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, TouchableNativeFeedback } from 'react-native';
 import Modal from 'react-native-simple-modal';
-// import PushNotification from 'react-native-push-notification';
 import { inject, observer } from 'mobx-react';
 import { Icon } from '../../common';
 
@@ -9,14 +8,6 @@ import { Icon } from '../../common';
 @observer
 class ReminderModal extends Component {
   render() {
-    // PushNotification.configure({
-    //   onNotification(notification) {
-    //         const clicked = notification.userInteraction;
-    //         if (clicked) {
-    //           itemStore.reminderSetted = false;
-    //         }
-    //     }
-    // });
     const { itemStore } = this.props;
     const { reminderContainerStyle,
             choiceContainerStyle,

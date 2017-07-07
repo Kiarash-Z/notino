@@ -49,8 +49,19 @@ class Item {
     PushNotification.configure({
       onNotification(notification) {
             const clicked = notification.userInteraction;
+            const relatedItem = categoryDB.objects('Item').find(i => {
+              const reminderDate = JSON.parse(i.reminderDate);
+              console.log(reminderDate);
+              return reminderDate === notification.tag;
+            });
             if (clicked) {
-              if (!repeat) { itemStore.reminderSetted = false; }
+              Actions.itemEdit({ item: relatedItem });
+              if (!repeat) {
+                itemStore.reminderSetted = false;
+                categoryDB.write(() => {
+                  relatedItem.reminderSetted = false;
+                });
+              }
             }
         }
     });
@@ -70,6 +81,13 @@ class Item {
                 repeatType
               });
               this.reminderSetted = true;
+              categoryDB.write(() => {
+              const activeItem = categoryDB.objects('Item').find(item => {
+                return item.id === this.id;
+              });
+              activeItem.reminderSetted = this.reminderSetted;
+              activeItem.reminderDate = JSON.stringify(this.reminderDate);
+            });
             }
           });
         };

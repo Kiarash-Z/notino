@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { View, TouchableNativeFeedback, UIManager } from 'react-native';
 import { inject, observer } from 'mobx-react';
-// import PushNotification from 'react-native-push-notification';
 import { Icon } from '../common';
 
 @inject('itemStore', 'itemImageStore', 'itemVoiceStore', 'itemLocationStore')
