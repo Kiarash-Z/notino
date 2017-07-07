@@ -4,6 +4,7 @@ import Category from './components/pages/Category';
 import Categories from './components/pages/Categories';
 import ItemCreate from './components/pages/ItemCreate';
 import ItemEdit from './components/pages/ItemEdit';
+import ItemSearch from './components/pages/ItemSearch';
 
 const RouterComponent = () => {
   return (
@@ -12,7 +13,7 @@ const RouterComponent = () => {
           key="category"
           component={Category}
           hideNavBar
-          initial
+                    initial
         />
         <Scene
           key="categories"
@@ -27,6 +28,11 @@ const RouterComponent = () => {
         <Scene
           key="itemEdit"
           component={ItemEdit}
+          hideNavBar
+        />
+        <Scene
+          key="itemSearch"
+          component={ItemSearch}
           hideNavBar
         />
     </Router>

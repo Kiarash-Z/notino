@@ -51,6 +51,7 @@ class Category extends Component {
             rightIcon='category'
             leftIcon='search'
             onRightButtonPress={() => Actions.categories()}
+            onLeftButtonPress={() => Actions.itemSearch()}
           />
           <Header title={type} icon={icon} color={color} />
           <View style={[styles.noItemTextContainer, { display: displayNoItem }]}>
@@ -65,6 +66,8 @@ class Category extends Component {
         />
           <ActionButton
             icon={<Icon name="add" size={14} color="white" />}
+            offsetX={15}
+            offsetY={15}
             onPress={() => Actions.itemCreate()} buttonColor="#218ffe"
           />
         </View>

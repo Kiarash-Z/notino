@@ -1,10 +1,10 @@
 import React from 'react';
 import { TextInput } from 'react-native';
 
-const Input = ({ placeholder, value, size, align, onChangeText, maxLength }) => {
+const Input = ({ placeholder, value, size, align, onChangeText, maxLength, style }) => {
   return (
     <TextInput
-      style={[styles.inputStyle, { fontSize: size, textAlign: align }]}
+      style={[styles.inputStyle, { fontSize: size, textAlign: align }, style]}
       underlineColorAndroid="transparent"
       value={value}
       onChangeText={onChangeText}
