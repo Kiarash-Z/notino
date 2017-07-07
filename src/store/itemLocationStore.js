@@ -3,14 +3,13 @@ import { itemImageStore, itemStore } from './';
 
 class Location {
   @observable marker = {};
-  @observable showMapModal = false;;
+  @observable showMapModal = false;
   addLocation() {
       this.showMapModal = true;
       itemImageStore.showGallerySelector = false;
   }
   addMapToList() {
-    itemStore.map = { ...this.marker, type: 'map' };
-    itemStore.fileTypes.push('makan');
+    itemStore.map = { ...this.marker, type: 'map', timestamp: new Date().getTime() };
     this.showMapModal = false;
   }
   handleMapPress(e) {

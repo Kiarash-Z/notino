@@ -10,7 +10,6 @@ class Image {
   @observable openedImage = { uri: '', width: '', height: '' };
   @observable imageModalWidth = 0;
   mapImageToState({ uri, width, height }) {
-    itemStore.fileTypes.push('picture');
     itemStore.images.push({
       uri,
       width,

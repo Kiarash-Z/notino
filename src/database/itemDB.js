@@ -13,7 +13,7 @@ export default {
       },
       reminderSetted: 'bool',
       reminderDate: 'string',
-      marker: { type: 'list', objectType: 'Marker' },
+      map: 'string',
       voices: {
         type: 'list',
         objectType: 'Voice'

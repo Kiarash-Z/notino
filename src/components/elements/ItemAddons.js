@@ -14,14 +14,6 @@ class ItemAddons extends Component {
     render() {
       const { containerStyle, circleStyle, touchableStyle } = styles;
       const { itemStore, itemImageStore, itemVoiceStore, itemLocationStore } = this.props;
-      // PushNotification.configure({
-      //   onNotification(notification) {
-      //         const clicked = notification.userInteraction;
-      //         if (clicked) {
-      //           itemStore.reminderSetted = false;
-      //         }
-      //     }
-      // });
       const renderAlarm = () => {
         if (itemStore.reminderSetted) {
           return (

@@ -105,7 +105,7 @@ class ItemCreate extends Component {
                       <Animated.View
                         style={[
                           styles.voiceBgFill,
-                          itemVoiceStore.progressTimeline(item.playingVoiceTime),
+                          itemVoiceStore.progressTimeline(item),
                          ]}
                       />
                       <View style={styles.voiceTimelineBackground} />
@@ -120,7 +120,7 @@ class ItemCreate extends Component {
       }
   render() {
     const { itemStore } = this.props;
-    const allItems = itemStore.images.concat(itemStore.voices, itemStore.marker)
+    const allItems = itemStore.images.concat(itemStore.voices, itemStore.map)
     .sort((a, b) => a.timestamp - b.timestamp);
     return (
       <View style={{ flex: 1 }}>
@@ -130,7 +130,7 @@ class ItemCreate extends Component {
               rightInfo="ذخیره"
               rightInfoColor="#0288eb"
               leftIcon="back"
-              onLeftButtonPress={() => Actions.pop()}
+              onLeftButtonPress={() => itemStore.resetValues()}
               onRightButtonPress={() => itemStore.saveItemToDB()}
             />
           <ScrollView>

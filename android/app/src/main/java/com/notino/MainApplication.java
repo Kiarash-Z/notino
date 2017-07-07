@@ -6,9 +6,9 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.react.ReactApplication;
+import com.zmxv.RNSound.RNSoundPackage;
 import io.realm.react.RealmReactPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
-import com.zmxv.RNSound.RNSoundPackage;
 import com.rnim.rn.audio.ReactNativeAudioPackage;
 import com.horcrux.svg.SvgPackage;
 import com.airbnb.android.react.maps.MapsPackage;
@@ -31,9 +31,9 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNSoundPackage(),
             new RealmReactPackage(),
             new ReactNativePushNotificationPackage(),
-            new RNSoundPackage(),
             new ReactNativeAudioPackage(),
             new SvgPackage(),
             new MapsPackage(),

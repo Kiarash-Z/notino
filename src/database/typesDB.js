@@ -8,21 +8,14 @@ const imageDB = {
     timestamp: 'int'
   }
 };
-
-const markerDB = {
-  name: 'Marker',
-  properties: {
-    latitude: 'int',
-    longitude: 'int'
-  }
-};
-const VoiceDB = {
+const voiceDB = {
   name: 'Voice',
   properties: {
     type: 'string',
     duration: 'int',
     pathNum: 'int',
-    timestamp: 'int'
+    timestamp: 'int',
+    status: 'string'
   }
 };
-export { imageDB, markerDB, VoiceDB };
+export { imageDB, voiceDB };

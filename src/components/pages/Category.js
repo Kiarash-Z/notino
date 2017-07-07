@@ -95,7 +95,8 @@ const styles = {
   moreInfoTextStyle: {
     fontSize: 15,
     color: '#a8b5bd',
-    fontFamily: 'IS_Light'
+    fontFamily: 'IS_Light',
+    textAlign: 'right'
   }
 };
 

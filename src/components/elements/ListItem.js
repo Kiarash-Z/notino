@@ -14,7 +14,8 @@ class ListItem extends Component {
          } = styles;
     // this func will render icons passed from props
     const renderIcons = () => {
-      return icons.map((iconName) => {
+      const uniqueIcons = [...new Set(icons)];
+      return uniqueIcons.map((iconName) => {
           return (
             <Icon key={iconName} style={iconStyle} name={iconName} size={18} color="#a8b5bd" />
           );

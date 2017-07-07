@@ -1,7 +1,7 @@
 import Realm from 'realm';
 import uuidV4 from 'uuid/v4';
 import itemDB from './itemDB';
-import { imageDB, markerDB, VoiceDB } from './typesDB';
+import { imageDB, voiceDB } from './typesDB';
 
 const categoryDB = new Realm({ schema: [{
     name: 'Category',
@@ -22,8 +22,7 @@ const categoryDB = new Realm({ schema: [{
   },
   itemDB,
   imageDB,
-  VoiceDB,
-  markerDB,
+  voiceDB,
   {
     name: 'primitiveStr',
     properties: {

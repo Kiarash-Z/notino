@@ -6,11 +6,11 @@ import { inject, observer } from 'mobx-react';
 import { BoxShadow } from 'react-native-shadow';
 import { Icon } from '../../common';
 
-@inject('itemLocationStore')
+@inject('itemLocationStore', 'itemStore')
 @observer
 class MapModal extends Component {
   render() {
-    const { itemLocationStore } = this.props;
+    const { itemLocationStore, itemStore } = this.props;
     const { mapModalStyle,
             mapModalTextStyle,
             markerStyle,
@@ -22,8 +22,8 @@ class MapModal extends Component {
           return (
             <Marker
               coordinate={{
-                latitude: itemLocationStore.latitude,
-                longitude: itemLocationStore.longitude
+                latitude: itemLocationStore.marker.latitude,
+                longitude: itemLocationStore.marker.longitude
                 }}
             >
               <BoxShadow setting={shadowOpt}>
@@ -65,10 +65,10 @@ class MapModal extends Component {
             style={{
               ...StyleSheet.absoluteFillObject,
             }}
-            onPress={itemLocationStore.handleMapPress}
+            onPress={e => itemLocationStore.handleMapPress(e)}
             initialRegion={{
-              latitude: 32.4279,
-              longitude: 53.6880,
+              latitude: itemStore.map.latitude || 35.6892,
+              longitude: itemStore.map.longitude || 51.3890,
               latitudeDelta: 0.0922,
               longitudeDelta: 0.0421
             }}
@@ -97,6 +97,12 @@ const styles = {
     height: 400,
     paddingRight: 0,
     paddingLeft: 0
+  },
+  markerStyle: {
+    backgroundColor: '#0087ed',
+    width: 15,
+    height: 15,
+    borderRadius: 15
   },
   mapModalTextStyle: {
     alignSelf: 'center',
