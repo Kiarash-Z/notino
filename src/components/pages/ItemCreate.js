@@ -26,6 +26,9 @@ class ItemCreate extends Component {
     super(props);
     this.renderAllItems = this.renderAllItems.bind(this);
   }
+  componentWillMount() {
+    this.props.itemStore.resetValues();
+  }
   renderAllItems({ item }) {
     const { itemStore, itemImageStore, itemVoiceStore, itemLocationStore } = this.props;
     switch (item.type) {
@@ -122,6 +125,10 @@ class ItemCreate extends Component {
     const { itemStore } = this.props;
     const allItems = itemStore.images.concat(itemStore.voices, itemStore.map)
     .sort((a, b) => a.timestamp - b.timestamp);
+    let saveButtonDisabled = true;
+    if (itemStore.title.length > 0) {
+      saveButtonDisabled = false;
+    }
     return (
       <View style={{ flex: 1 }}>
 
@@ -130,8 +137,9 @@ class ItemCreate extends Component {
               rightInfo="ذخیره"
               rightInfoColor="#0288eb"
               leftIcon="back"
-              onLeftButtonPress={() => itemStore.resetValues()}
+              onLeftButtonPress={() => { itemStore.resetValues(); Actions.pop(); }}
               onRightButtonPress={() => itemStore.saveItemToDB()}
+              rightButtonDisabled={saveButtonDisabled}
             />
           <ScrollView>
             <ItemForm />

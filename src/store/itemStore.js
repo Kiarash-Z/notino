@@ -51,10 +51,9 @@ class Item {
             const clicked = notification.userInteraction;
             const relatedItem = categoryDB.objects('Item').find(i => {
               const reminderDate = JSON.parse(i.reminderDate);
-              console.log(reminderDate);
               return reminderDate === notification.tag;
             });
-            if (clicked) {
+            if (clicked && relatedItem) {
               Actions.itemEdit({ item: relatedItem });
               if (!repeat) {
                 itemStore.reminderSetted = false;
@@ -85,8 +84,10 @@ class Item {
               const activeItem = categoryDB.objects('Item').find(item => {
                 return item.id === this.id;
               });
-              activeItem.reminderSetted = this.reminderSetted;
-              activeItem.reminderDate = JSON.stringify(this.reminderDate);
+              if (activeItem) {
+                activeItem.reminderSetted = this.reminderSetted;
+                activeItem.reminderDate = JSON.stringify(this.reminderDate);
+              }
             });
             }
           });
@@ -102,7 +103,7 @@ class Item {
       }
   }
   resetValues() {
-    Actions.pop();
+    this.voices.map(voice => voice.sound.pause());
     this.title = '';
     this.shortDescription = '';
     this.id = '';
@@ -185,11 +186,18 @@ class Item {
       this.fileTypes.push('link');
     }
     categoryDB.write(() => {
+      const evaluateCategory = () => {
+        try {
+          return categoryDB.objects('Category').slice()[2].type || this.category;
+        } catch (e) {
+          return '';
+        }
+      };
       categoryDB.create('Item', {
           title: this.title,
           shortDescription: this.shortDescription,
           id: uuidV4(),
-          category: this.category,
+          category: evaluateCategory(),
           link: this.link,
           images: this.convertImages(),
           reminderSetted: this.reminderSetted,
@@ -198,6 +206,7 @@ class Item {
           voices: this.convertVoices(),
           fileTypes: this.convertFileTypes()
       });
+      Actions.pop();
       this.resetValues();
     });
   }
@@ -216,6 +225,7 @@ class Item {
       activeItem.map = JSON.stringify(this.map);
       activeItem.voices = this.convertVoices();
       activeItem.fileTypes = this.convertFileTypes();
+      Actions.pop();
       this.resetValues();
     });
     }

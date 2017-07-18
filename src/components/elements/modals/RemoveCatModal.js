@@ -3,39 +3,37 @@ import { View, Text, TouchableNativeFeedback } from 'react-native';
 import Modal from 'react-native-simple-modal';
 import { inject, observer } from 'mobx-react';
 
-@inject('itemStore')
+@inject('categoryStore')
 @observer
-class RemoveModal extends Component {
+class RemoveCatModal extends Component {
   render() {
-    const { itemStore } = this.props;
+    const { categoryStore } = this.props;
     const { removeModalStyle,
             removeModalChoiceStyle,
             removeModalQuesStyle,
             removeModalTextContainerStyle } = styles;
     return (
       <Modal
-        open={itemStore.showRemoveModal}
-        modalDidClose={() => { itemStore.showRemoveModal = false; }}
+        open={categoryStore.showCatRemoveModal}
+        modalDidClose={() => { categoryStore.showCatRemoveModal = false; }}
         modalStyle={removeModalStyle}
       >
         <Text style={removeModalQuesStyle}>
-          آیا میخواید این {itemStore.itemRemoveType} رو حذف کنید؟
+          آیا از حذف این دسته بندی و آیتم های اون اطمینان دارید؟
         </Text>
         <View style={removeModalTextContainerStyle}>
           <TouchableNativeFeedback
-            background={TouchableNativeFeedback.SelectableBackground()}
-            onPress={() => setTimeout(() => { itemStore.showRemoveModal = false; }, 100)}
+            onPress={() => setTimeout(() => { categoryStore.showCatRemoveModal = false; }, 100)}
           >
             <View>
               <Text style={removeModalChoiceStyle}>خیر</Text>
             </View>
             </TouchableNativeFeedback>
           <TouchableNativeFeedback
-            background={TouchableNativeFeedback.SelectableBackground()}
             onPress={() => {
             // just a delay for button interaction
             setTimeout(() => {
-                itemStore.removeItem();
+                categoryStore.removeCategory();
               }, 100);
             }}
           >
@@ -72,4 +70,4 @@ const styles = {
   }
 };
 
-export default RemoveModal;
+export default RemoveCatModal;

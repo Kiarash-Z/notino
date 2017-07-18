@@ -11,6 +11,7 @@ const Input = ({ placeholder, value, size, align, onChangeText, maxLength, style
       placeholder={placeholder}
       placeholderTextColor='rgba(0,0,0,.3)'
       maxLength={maxLength}
+      autoCorrect={false}
     />
   );
 };

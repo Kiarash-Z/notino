@@ -11,6 +11,8 @@ class BottomContainer extends Component {
     const { bottomContainerStyle,
             selectingImageContainer,
             recorderContainerStyle,
+            imageContainerStyle,
+            moreTextStyle,
             recorderTimerStyle } = styles;
     const { itemImageStore, itemStore, itemVoiceStore } = this.props;
     const renderImages = ({ item }) => {
@@ -38,12 +40,19 @@ class BottomContainer extends Component {
     const showImages = () => {
       if (itemImageStore.showGallerySelector) {
         return (
-          <FlatList
+          <View style={imageContainerStyle}>
+            <FlatList
               data={itemImageStore.galleryImages}
               renderItem={renderImages}
               keyExtractor={item => item.uri}
               horizontal
-          />
+            />
+            <Text
+              onPress={() => itemImageStore.imageContainerSwipeUp()}
+              style={moreTextStyle}
+            >...
+            </Text>
+          </View>
         );
       }
     };
@@ -92,9 +101,7 @@ const styles = {
     flex: 1
   },
   selectingImageContainer: {
-    paddingTop: 10,
-    paddingLeft: 10,
-    paddingRight: 10,
+    paddingTop: 5,
     position: 'absolute',
     bottom: -10,
     left: 0,
@@ -116,12 +123,27 @@ const styles = {
     color: '#7b75f9',
     fontSize: 18
   },
+  imageContainerStyle: {
+    padding: 5,
+    paddingTop: 0,
+    backgroundColor: 'transparent',
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
   selectingImagesStyle: {
     marginBottom: 10,
     width: 60,
     height: 60,
     borderRadius: 5,
     marginRight: 15
+  },
+  moreTextStyle: {
+    fontSize: 20,
+    fontFamily: 'IS_Bold',
+    paddingLeft: 8,
+    marginTop: -26,
+    paddingTop: 8,
+    paddingRight: 8
   }
 };
 

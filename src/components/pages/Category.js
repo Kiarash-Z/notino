@@ -1,24 +1,38 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableNativeFeedback, FlatList } from 'react-native';
+import { View, Text, TouchableNativeFeedback, FlatList, Image } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import ActionButton from 'react-native-action-button';
+import { inject, observer } from 'mobx-react';
 import Header from '../elements/Header';
 import { Navigation, Icon, ItemSection } from '../common';
 import ListItem from '../elements/ListItem';
 import categoryDB from '../../database/categoryDB';
+import RemoveItemModal from '../elements/modals/RemoveItemModal';
 
+@inject('categoryStore')
+@observer
 class Category extends Component {
   componentWillMount() {
+    this.props.categoryStore.createInitialCategories();
+  }
+  componentDidMount() {
     categoryDB.addListener('change', () => this.forceUpdate());
   }
   componentWillUnmount() {
     categoryDB.removeListener('change', () => this.forceUpdate());
   }
   renderItems({ item }) {
+    const { categoryStore } = this.props;
     const { title, fileTypes, shortDescription } = item;
     const extractedFileTypes = fileTypes.map(type => type.value);
     return (
-      <TouchableNativeFeedback onPress={() => Actions.itemEdit({ item })}>
+      <TouchableNativeFeedback
+        onPress={() => Actions.itemEdit({ item })}
+        onLongPress={() => {
+          categoryStore.showRemoveModal = true;
+          categoryStore.itemRemove = item;
+        }}
+      >
         <View>
           <ItemSection>
             <ListItem icons={extractedFileTypes} title={title}>
@@ -46,30 +60,39 @@ class Category extends Component {
     }
     return (
         <View style={{ flex: 1 }}>
-          {/* Navigation */}
-          <Navigation
-            rightIcon='category'
-            leftIcon='search'
-            onRightButtonPress={() => Actions.categories()}
-            onLeftButtonPress={() => Actions.itemSearch()}
-          />
-          <Header title={type} icon={icon} color={color} />
-          <View style={[styles.noItemTextContainer, { display: displayNoItem }]}>
-            <Text style={styles.noItemTextStyle}>
-              اولین آیتمو ایجاد کن!
-            </Text>
+          <View style={{ flex: 1, backgroundColor: 'white' }}>
+            <Navigation
+              rightIcon='category'
+              leftIcon='search'
+              onRightButtonPress={() => Actions.categories()}
+              onLeftButtonPress={() => Actions.itemSearch()}
+            >
+              <Image
+                source={require('../../assets/images/logo.png')}
+                style={{ width: 90, height: 23 }}
+              />
+            </Navigation>
+            <View style={{ flex: 1 }}>
+              <Header title={type} icon={icon} color={color} />
+              <View style={[styles.noItemTextContainer, { display: displayNoItem }]}>
+                <Text style={styles.noItemTextStyle}>
+                  اولین آیتمو ایجاد کن!
+                </Text>
+              </View>
+              <FlatList
+                data={relatedItems}
+                renderItem={this.renderItems.bind(this)}
+                keyExtractor={item => item.id}
+              />
+              <ActionButton
+                icon={<Icon name="add" size={14} color="white" />}
+                offsetX={15}
+                offsetY={15}
+                onPress={() => Actions.itemCreate()} buttonColor="#218ffe"
+              />
+            </View>
           </View>
-        <FlatList
-          data={relatedItems}
-          renderItem={this.renderItems}
-          keyExtractor={item => item.id}
-        />
-          <ActionButton
-            icon={<Icon name="add" size={14} color="white" />}
-            offsetX={15}
-            offsetY={15}
-            onPress={() => Actions.itemCreate()} buttonColor="#218ffe"
-          />
+          <RemoveItemModal />
         </View>
     );
   }

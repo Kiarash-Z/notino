@@ -3,28 +3,28 @@ import { View, Text, TouchableNativeFeedback } from 'react-native';
 import Modal from 'react-native-simple-modal';
 import { inject, observer } from 'mobx-react';
 
-@inject('itemStore')
+@inject('categoryStore')
 @observer
-class RemoveModal extends Component {
+class RemoveItemModal extends Component {
   render() {
-    const { itemStore } = this.props;
+    const { categoryStore } = this.props;
     const { removeModalStyle,
             removeModalChoiceStyle,
             removeModalQuesStyle,
             removeModalTextContainerStyle } = styles;
     return (
       <Modal
-        open={itemStore.showRemoveModal}
-        modalDidClose={() => { itemStore.showRemoveModal = false; }}
+        open={categoryStore.showRemoveModal}
+        modalDidClose={() => { categoryStore.showRemoveModal = false; }}
         modalStyle={removeModalStyle}
       >
         <Text style={removeModalQuesStyle}>
-          آیا میخواید این {itemStore.itemRemoveType} رو حذف کنید؟
+          آیا میخواید این آیتم رو حذف کنید؟
         </Text>
         <View style={removeModalTextContainerStyle}>
           <TouchableNativeFeedback
             background={TouchableNativeFeedback.SelectableBackground()}
-            onPress={() => setTimeout(() => { itemStore.showRemoveModal = false; }, 100)}
+            onPress={() => setTimeout(() => { categoryStore.showRemoveModal = false; }, 100)}
           >
             <View>
               <Text style={removeModalChoiceStyle}>خیر</Text>
@@ -35,7 +35,7 @@ class RemoveModal extends Component {
             onPress={() => {
             // just a delay for button interaction
             setTimeout(() => {
-                itemStore.removeItem();
+                categoryStore.removeItem();
               }, 100);
             }}
           >
@@ -72,4 +72,4 @@ const styles = {
   }
 };
 
-export default RemoveModal;
+export default RemoveItemModal;

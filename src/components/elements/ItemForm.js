@@ -7,16 +7,22 @@ import categoryDB from '../../database/categoryDB';
 @inject('itemStore')
 @observer
 class ItemForm extends Component {
+  componentWillMount() {
+    const active = categoryDB.objects('Category').find(cat => cat.active);
+    if (active.type !== 'همه') {
+      this.props.itemStore.updateValue({ prop: 'category', value: active.type });
+    }
+  }
   render() {
     const { itemStore } = this.props;
     const { title, shortDescription, category, link } = itemStore;
     const { sectionStyle } = styles;
     const renderPicker = () => {
       return categoryDB.objects('Category')
-      .filter((item) => item.type !== 'همه')
+      .filter((item) => (item.type !== 'همه') && (item.type !== 'ایجاد دسته'))
       .map((item, index) => {
           return (
-            <Picker.Item label={item.type} value={String(index)} key={index} />
+            <Picker.Item label={item.type} value={item.type} key={index} />
           );
       });
     };

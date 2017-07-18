@@ -167,7 +167,7 @@ class ItemCreate extends Component {
               rightInfo="ذخیره"
               rightInfoColor="#0288eb"
               leftIcon="back"
-              onLeftButtonPress={() => itemStore.resetValues()}
+              onLeftButtonPress={() => { itemStore.resetValues(); Actions.pop(); }}
               onRightButtonPress={() => itemStore.editItemFromDB()}
             />
           <ScrollView>
