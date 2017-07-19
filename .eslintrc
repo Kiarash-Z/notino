@@ -8,6 +8,7 @@
     "prefer-template": 0,
     "new-parens": 0,
     "array-callback-return": 0,
-    "no-underscore-dangle": 0
+    "no-underscore-dangle": 0,
+    "global-require": 0
   }
 }

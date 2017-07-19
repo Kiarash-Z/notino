@@ -5,15 +5,21 @@ import Categories from './components/pages/Categories';
 import ItemCreate from './components/pages/ItemCreate';
 import ItemEdit from './components/pages/ItemEdit';
 import ItemSearch from './components/pages/ItemSearch';
+import AppIntro from './components/pages/AppIntro';
 
 const RouterComponent = () => {
   return (
     <Router>
         <Scene
+          key='appIntro'
+          component={AppIntro}
+          hideNavBar
+        />
+        <Scene
           key="category"
           component={Category}
           hideNavBar
-                    initial
+          initial
         />
         <Scene
           key="categories"

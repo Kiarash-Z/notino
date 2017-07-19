@@ -3,6 +3,7 @@ import { observable } from 'mobx';
 import { AudioUtils } from 'react-native-audio';
 import RNFS from 'react-native-fs';
 import PushNotification from 'react-native-push-notification';
+import { ToastAndroid } from 'react-native';
 import categoryDB from '../database/categoryDB';
 import uuidV4 from 'uuid/v4';
 
@@ -64,6 +65,7 @@ class Category {
   }
   createInitialCategories() {
     if (categoryDB.objects('Category').length === 0) {
+      Actions.appIntro({ type: 'reset' });
       // initial categories
       categoryDB.write(() => {
         categoryDB.create('Category', {
@@ -102,7 +104,7 @@ class Category {
           type: 'کار',
           id: uuidV4(),
           icon: 'kar',
-          color: '#66BB6A',
+          color: '#68ca89',
           active: false,
           changable: true
         });
@@ -130,17 +132,23 @@ class Category {
     });
   }
   createCategory() {
-    categoryDB.write(() => {
-      categoryDB.create('Category', {
-        type: this.createCatName,
-        id: uuidV4(),
-        icon: this.activeIcon,
-        color: this.activeColor,
-        active: false,
-        changable: true
+    const categories = categoryDB.objects('Category').slice();
+    const sameCat = categories.find(cat => this.createCatName === cat.type);
+    if (sameCat) {
+      ToastAndroid.show('دسته بندی با این نام قبلا ایجاد شده', ToastAndroid.SHORT)
+    } else {
+      categoryDB.write(() => {
+        categoryDB.create('Category', {
+          type: this.createCatName,
+          id: uuidV4(),
+          icon: this.activeIcon,
+          color: this.activeColor,
+          active: false,
+          changable: true
+        });
       });
-    });
-    this.resetCreateValues();
+      this.resetCreateValues();
+    }
   }
   removeCategory() {
     categoryDB.write(() => {
