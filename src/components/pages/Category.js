@@ -3,6 +3,7 @@ import { View, Text, TouchableNativeFeedback, FlatList, Image } from 'react-nati
 import { Actions } from 'react-native-router-flux';
 import ActionButton from 'react-native-action-button';
 import { inject, observer } from 'mobx-react';
+import SplashScreen from 'react-native-splash-screen';
 import Header from '../elements/Header';
 import { Navigation, Icon, ItemSection } from '../common';
 import ListItem from '../elements/ListItem';
@@ -13,6 +14,7 @@ import RemoveItemModal from '../elements/modals/RemoveItemModal';
 @observer
 class Category extends Component {
   componentWillMount() {
+    SplashScreen.hide();
     this.props.categoryStore.createInitialCategories();
   }
   componentDidMount() {

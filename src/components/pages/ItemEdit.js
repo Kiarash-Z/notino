@@ -12,6 +12,7 @@ import MapView, { Marker } from 'react-native-maps';
 import { Actions } from 'react-native-router-flux';
 import Sound from 'react-native-sound';
 import { AudioUtils } from 'react-native-audio';
+import SplashScreen from 'react-native-splash-screen';
 import { Navigation, Icon } from '../common';
 import ItemAddons from '../elements/ItemAddons';
 import ItemForm from '../elements/ItemForm';
@@ -61,6 +62,9 @@ class ItemCreate extends Component {
       });
       return i;
     });
+  }
+  componentDidMount() {
+    SplashScreen.hide();
   }
   renderAllItems({ item }) {
     const { itemStore, itemImageStore, itemVoiceStore, itemLocationStore } = this.props;

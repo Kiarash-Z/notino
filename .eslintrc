@@ -9,6 +9,7 @@
     "new-parens": 0,
     "array-callback-return": 0,
     "no-underscore-dangle": 0,
-    "global-require": 0
+    "global-require": 0,
+    "eqeqeq": 0
   }
 }

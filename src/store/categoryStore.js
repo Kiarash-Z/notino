@@ -4,8 +4,8 @@ import { AudioUtils } from 'react-native-audio';
 import RNFS from 'react-native-fs';
 import PushNotification from 'react-native-push-notification';
 import { ToastAndroid } from 'react-native';
-import categoryDB from '../database/categoryDB';
 import uuidV4 from 'uuid/v4';
+import categoryDB from '../database/categoryDB';
 
 class Category {
   @observable items = [];
@@ -135,7 +135,7 @@ class Category {
     const categories = categoryDB.objects('Category').slice();
     const sameCat = categories.find(cat => this.createCatName === cat.type);
     if (sameCat) {
-      ToastAndroid.show('دسته بندی با این نام قبلا ایجاد شده', ToastAndroid.SHORT)
+      ToastAndroid.show('دسته بندی با این نام قبلا ایجاد شده', ToastAndroid.SHORT);
     } else {
       categoryDB.write(() => {
         categoryDB.create('Category', {
@@ -152,7 +152,7 @@ class Category {
   }
   removeCategory() {
     categoryDB.write(() => {
-      const items = categoryDB.objects('Item')
+      const items = categoryDB.objects('Item');
       items.slice().filter(item => {
         if (item.category === this.categoryRemove.type) {
           item.voices.map(voice => {

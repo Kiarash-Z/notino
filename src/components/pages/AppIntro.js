@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
 import { View, TouchableNativeFeedback, Text, Image, Dimensions } from 'react-native';
 import Swiper from 'react-native-swiper';
+import SplashScreen from 'react-native-splash-screen';
 import { Actions } from 'react-native-router-flux';
 import IntroSlide from '../elements/IntroSlide';
 import { Icon } from '../common';
 
 class AppIntro extends Component {
+  componentDidMount() {
+    SplashScreen.hide();
+  }
   render() {
     const { imageStyle,
             logoTextStyle,
