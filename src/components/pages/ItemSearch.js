@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, Text, FlatList, TouchableNativeFeedback } from 'react-native';
 import { inject, observer } from 'mobx-react';
 import { Actions } from 'react-native-router-flux';
+import SplashScreen from 'react-native-splash-screen';
 import ListItem from '../elements/ListItem';
 import categoryDB from '../../database/categoryDB';
 import { Navigation, Input, Icon, ItemSection } from '../common';
@@ -15,9 +16,10 @@ class ItemSearch extends Component {
   }
   componentDidMount() {
     this.props.categoryStore.items = categoryDB.objects('Item');
+    SplashScreen.hide();
   }
   renderItem({ item }) {
-    const { title, fileTypes, shortDescription } = item;
+    const { title, fileTypes, description } = item;
     const extractedFileTypes = fileTypes.map(type => type.value);
     return (
       <TouchableNativeFeedback
@@ -30,7 +32,7 @@ class ItemSearch extends Component {
         <View>
           <ItemSection>
             <ListItem icons={extractedFileTypes} title={title}>
-              <Text style={styles.moreInfoTextStyle}>{shortDescription}</Text>
+              <Text style={styles.moreInfoTextStyle}>{description}</Text>
             </ListItem>
           </ItemSection>
         </View>
@@ -44,7 +46,7 @@ class ItemSearch extends Component {
             searchInputContainerStyle,
             searchIconStyle } = styles;
     return (
-      <View>
+      <View style={{ backgroundColor: 'white', flex: 1 }}>
         <Navigation
           leftIcon="back"
           onLeftButtonPress={() => Actions.pop()}

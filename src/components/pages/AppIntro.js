@@ -22,8 +22,8 @@ class AppIntro extends Component {
     return (
       <Swiper
         loop={false}
-        dotStyle={{ marginBottom: Dimensions.get('window').height / 5.5 }}
         activeDotStyle={activeDotStyle}
+        dotStyle={{ marginBottom: 30 }}
       >
         <IntroSlide
           mainTitle='ساده و راحت'
@@ -47,7 +47,7 @@ class AppIntro extends Component {
           <Image source={require('../../assets/images/logo.png')} style={logoStyle} />
           <Text style={logoTextStyle}>با نوتینو بروز بنویس :)</Text>
           <View style={{ justifyContent: 'flex-end', flex: 1 }}>
-            <TouchableNativeFeedback onPress={() => Actions.category({ type: 'replace' })}>
+            <TouchableNativeFeedback onPress={() => Actions.itemCreate({ type: 'replace' })}>
               <View style={buttonStyle}>
                 <Text style={buttonTextStyle}>شروع کنید به نوشتن</Text>
                 <Icon name="edit" size={18} color="rgba(0,0,0, .5)" />
@@ -66,7 +66,7 @@ const styles = {
     height: Dimensions.get('window').width - 100
   },
   activeDotStyle: {
-    marginBottom: Dimensions.get('window').height / 5.5,
+    marginBottom: 30,
     backgroundColor: '#3498db',
     width: 10,
     height: 10,
@@ -79,8 +79,9 @@ const styles = {
   lastSlideStyle: {
      alignItems: 'center',
      paddingTop: 35,
-     paddingBottom: 65,
-     flex: 1
+     paddingBottom: 115,
+     flex: 1,
+     backgroundColor: 'white'
   },
   buttonStyle: {
     backgroundColor: '#f5f5f5',
@@ -90,8 +91,7 @@ const styles = {
     width: Dimensions.get('window').width - 170,
     borderRadius: 3,
     paddingTop: 10,
-    paddingBottom: 10,
-    marginTop: 80
+    paddingBottom: 10
   },
   buttonTextStyle: {
     fontFamily: 'IS_Reg',

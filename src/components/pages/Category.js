@@ -10,23 +10,68 @@ import ListItem from '../elements/ListItem';
 import categoryDB from '../../database/categoryDB';
 import RemoveItemModal from '../elements/modals/RemoveItemModal';
 
-@inject('categoryStore')
+@inject('categoryStore', 'itemStore')
 @observer
 class Category extends Component {
   componentWillMount() {
-    SplashScreen.hide();
     this.props.categoryStore.createInitialCategories();
+    this.props.itemStore.resetValues();
   }
   componentDidMount() {
+    SplashScreen.hide();
     categoryDB.addListener('change', () => this.forceUpdate());
   }
   componentWillUnmount() {
     categoryDB.removeListener('change', () => this.forceUpdate());
   }
+  renderImage({ item }) {
+    return (
+      <View style={styles.imageContainerStyle}>
+        <Image source={{ uri: item.uri }} style={styles.imageStyle} />
+      </View>
+    );
+  }
   renderItems({ item }) {
     const { categoryStore } = this.props;
-    const { title, fileTypes, shortDescription } = item;
+    const { title, fileTypes, description, images } = item;
     const extractedFileTypes = fileTypes.map(type => type.value);
+    let computedDescription = description;
+    computedDescription = computedDescription.replace(/\n|\r/g, '');
+    if (computedDescription.length > 30) {
+      computedDescription = `${computedDescription.slice(0, 30)}...`;
+    }
+    const renderImageList = () => {
+      if (images.length < 3) {
+        return (
+          <View style={styles.imagesContainerStyle}>
+            <FlatList
+              style={{ flexDirection: 'row-reverse' }}
+              data={images}
+              renderItem={this.renderImage}
+              keyExtractor={i => i.timestamp}
+              horizontal
+            />
+          </View>
+        );
+      } else if (images.length >= 3) {
+        return (
+          <View style={styles.imagesContainerStyle}>
+            <FlatList
+              style={{ flexDirection: 'row-reverse' }}
+              data={images.slice(0, 2)}
+              renderItem={this.renderImage}
+              keyExtractor={i => i.timestamp}
+              horizontal
+            />
+            <View
+              style={[styles.imageContainerStyle, styles.moreImagesStyle]}
+            >
+                  <Text style={{ fontSize: 18, lineHeight: 4 }}>...</Text>
+                </View>
+          </View>
+        );
+      }
+    };
     return (
       <TouchableNativeFeedback
         onPress={() => Actions.itemEdit({ item })}
@@ -38,8 +83,9 @@ class Category extends Component {
         <View>
           <ItemSection>
             <ListItem icons={extractedFileTypes} title={title}>
-              <Text style={styles.moreInfoTextStyle}>{shortDescription}</Text>
+              <Text style={styles.moreInfoTextStyle}>{computedDescription}</Text>
             </ListItem>
+            {renderImageList()}
           </ItemSection>
         </View>
       </TouchableNativeFeedback>
@@ -55,7 +101,7 @@ class Category extends Component {
         return true;
       }
       return item.category === type;
-    });
+    }).sort((a, b) => Number(a.id) - Number(b.id));
     let displayNoItem = 'flex';
     if (relatedItems.length > 0) {
       displayNoItem = 'none';
@@ -116,15 +162,40 @@ const styles = {
     color: '#a8b5bd',
     paddingBottom: 10,
     marginBottom: -20,
-    alignSelf: 'center',
-    borderBottomWidth: 1,
-    borderColor: 'rgba(0,0,0,.2)'
+    alignSelf: 'center'
   },
   moreInfoTextStyle: {
     fontSize: 15,
     color: '#a8b5bd',
     fontFamily: 'IS_Light',
     textAlign: 'right'
+  },
+  imagesContainerStyle: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingRight: 15,
+    marginTop: 5
+  },
+  imageContainerStyle: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    marginLeft: 8
+  },
+  imageStyle: {
+    width: 40,
+    height: 40,
+    borderRadius: 5
+  },
+  moreImagesStyle: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'flex-end',
+    backgroundColor: '#e3e3e3',
+    position: 'absolute',
+    right: 111
   }
 };
 

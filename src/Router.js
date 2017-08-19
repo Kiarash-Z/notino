@@ -1,5 +1,5 @@
 import React from 'react';
-import { Scene, Router } from 'react-native-router-flux';
+import { Scene, Router, Actions } from 'react-native-router-flux';
 import Category from './components/pages/Category';
 import Categories from './components/pages/Categories';
 import ItemCreate from './components/pages/ItemCreate';
@@ -7,9 +7,18 @@ import ItemEdit from './components/pages/ItemEdit';
 import ItemSearch from './components/pages/ItemSearch';
 import AppIntro from './components/pages/AppIntro';
 
+const onBackPress = () => {
+  if (Actions.state.index === 0) {
+    return false;
+  }
+  Actions.pop();
+  return true;
+};
+
 const RouterComponent = () => {
   return (
-    <Router>
+    <Router backAndroidHandler={onBackPress}>
+      <Scene key="root">
         <Scene
           key='appIntro'
           component={AppIntro}
@@ -41,6 +50,7 @@ const RouterComponent = () => {
           component={ItemSearch}
           hideNavBar
         />
+      </Scene>
     </Router>
   );
 };

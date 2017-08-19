@@ -3,7 +3,7 @@ export default {
     primaryKey: 'id',
     properties: {
       title: 'string',
-      shortDescription: 'string',
+      description: 'string',
       id: 'string',
       category: 'string',
       link: 'string',

@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import { View, TouchableNativeFeedback, Text, Dimensions } from 'react-native';
 import { Actions } from 'react-native-router-flux';
+import { inject, observer } from 'mobx-react';
 import { Icon } from '../common';
 
+@inject('categoryStore')
+@observer
 class IntroSlide extends Component {
   render() {
     const { titleStyle,
@@ -15,7 +18,12 @@ class IntroSlide extends Component {
           {this.props.children}
           <Text style={titleStyle}>{this.props.mainTitle}</Text>
           <Text style={subTitleStyle}>{this.props.subTitle}</Text>
-          <TouchableNativeFeedback onPress={() => Actions.category({ type: 'replace' })}>
+          <TouchableNativeFeedback
+            onPress={() => {
+              this.props.categoryStore.userFirstEntered = true;
+              Actions.itemCreate({ type: 'replace' });
+          }}
+          >
             <View style={buttonStyle}>
               <Text style={buttonTextStyle}>شروع کنید به نوشتن</Text>
               <Icon name="edit" size={18} color="rgba(0,0,0, .5)" />
@@ -62,7 +70,7 @@ const styles = {
     borderRadius: 3,
     paddingTop: 10,
     paddingBottom: 10,
-    marginTop: 80
+    marginTop: 30
   },
   buttonTextStyle: {
     fontFamily: 'IS_Reg',

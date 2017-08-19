@@ -9,7 +9,7 @@ class Header extends Component {
       <View style={containerStyle}>
         <View style={titleContainerStyle}>
           <Text style={titleStyle}>{this.props.title}</Text>
-          <Icon name={this.props.icon} size={35} color={this.props.color} />
+          <Icon name={this.props.icon} size={33} color={this.props.color} />
         </View>
         <Text style={subTitle}>لیست یادداشت های من</Text>
       </View>
@@ -19,8 +19,8 @@ class Header extends Component {
 
 const styles = {
   containerStyle: {
-    paddingTop: 35,
-    paddingBottom: 35,
+    paddingTop: 15,
+    paddingBottom: 30,
   },
   titleContainerStyle: {
     flexDirection: 'row',
@@ -33,7 +33,7 @@ const styles = {
     fontSize: 14
   },
   titleStyle: {
-    fontSize: 40,
+    fontSize: 35,
     marginRight: 10,
     color: 'rgba(0,0,0, .8)',
     fontFamily: 'IS_Reg'

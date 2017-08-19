@@ -8,7 +8,7 @@ import categoryDB from '../database/categoryDB';
 
 class Item {
   @observable title = '';
-  @observable shortDescription = '';
+  @observable description = '';
   @observable id = '';
   @observable link = '';
   @observable category = '';
@@ -21,7 +21,10 @@ class Item {
   @observable reminderDate = '';
   @observable itemRemove = '';
   @observable itemRemoveType = '';
+  @observable showSelectCatModal = false;
+  @observable timestamp = 0;
   @observable map = [];
+
   updateValue({ prop, value }) {
     this[prop] = value;
   }
@@ -74,7 +77,7 @@ class Item {
               this.reminderDate = date;
               PushNotification.localNotificationSchedule({
                 title: this.title,
-                message: this.shortDescription,
+                message: this.description,
                 tag: date,
                 date,
                 repeatType
@@ -105,7 +108,7 @@ class Item {
   resetValues() {
     this.voices.map(voice => voice.sound.pause());
     this.title = '';
-    this.shortDescription = '';
+    this.description = '';
     this.id = '';
     this.link = '';
     this.category = '';
@@ -181,23 +184,17 @@ class Item {
     });
     return marker;
   }
-  saveItemToDB() {
+  saveItemToDB(userFirstEntered) {
     if (this.link.length > 0) {
       this.fileTypes.push('link');
     }
     categoryDB.write(() => {
-      const evaluateCategory = () => {
-        try {
-          return categoryDB.objects('Category').slice()[2].type || this.category;
-        } catch (e) {
-          return '';
-        }
-      };
       categoryDB.create('Item', {
           title: this.title,
-          shortDescription: this.shortDescription,
-          id: uuidV4(),
-          category: evaluateCategory(),
+          description: this.description,
+          blankTestt: 'Lol',
+          id: String(new Date().getTime()),
+          category: this.category,
           link: this.link,
           images: this.convertImages(),
           reminderSetted: this.reminderSetted,
@@ -206,8 +203,11 @@ class Item {
           voices: this.convertVoices(),
           fileTypes: this.convertFileTypes()
       });
-      Actions.pop();
-      this.resetValues();
+      if (userFirstEntered) {
+        Actions.category({ type: 'replace' });
+      } else {
+        Actions.pop();
+      }
     });
   }
   editItemFromDB() {
@@ -216,7 +216,7 @@ class Item {
         return item.id === this.id;
       });
       activeItem.title = this.title;
-      activeItem.shortDescription = this.shortDescription;
+      activeItem.description = this.description;
       activeItem.category = this.category;
       activeItem.link = this.link;
       activeItem.images = this.convertImages();
@@ -226,7 +226,6 @@ class Item {
       activeItem.voices = this.convertVoices();
       activeItem.fileTypes = this.convertFileTypes();
       Actions.pop();
-      this.resetValues();
     });
     }
   }

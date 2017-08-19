@@ -19,7 +19,7 @@ class Navigation extends Component {
       <View style={containerStyle}>
         <TouchableWithoutFeedback onPress={onLeftButtonPress}>
           <View style={infoStyle}>
-            <Icon name={leftIcon} size={25} color="#234960" />
+            <Icon name={leftIcon} size={23} color="#234960" />
           </View>
         </TouchableWithoutFeedback>
         <View style={searchContainerStyle}>
@@ -28,7 +28,7 @@ class Navigation extends Component {
         <TouchableWithoutFeedback onPress={onRightButtonPress} disabled={rightButtonDisabled}>
           <View style={infoStyle}>
               <Text style={[rightInfoTextStyle, { color: disabledColor }]}>{rightInfo}</Text>
-              <Icon name={rightIcon} size={25} color="#234960" />
+              <Icon name={rightIcon} size={23} color="#234960" />
           </View>
       </TouchableWithoutFeedback>
       </View>
@@ -40,9 +40,6 @@ const styles = {
   containerStyle: {
     flexDirection: 'row',
     backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
     elevation: 1,
     alignItems: 'center',
     justifyContent: 'space-between'
@@ -50,9 +47,9 @@ const styles = {
   infoStyle: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 20,
-    paddingBottom: 20,
-    paddingRight: 15,
+    paddingTop: 17,
+    paddingBottom: 17,
+    paddingRight: 20,
     paddingLeft: 15,
   },
   rightInfoTextStyle: {

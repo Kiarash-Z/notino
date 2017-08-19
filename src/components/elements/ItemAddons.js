@@ -22,7 +22,7 @@ class ItemAddons extends Component {
               <View style={touchableStyle}>
                 <View>
                   <View style={circleStyle} />
-                  <Icon name="alarm" size={21} color="#7b75f9" />
+                  <Icon name="alarm" size={21} color="#58a9e0" />
                 </View>
               </View>
             </TouchableNativeFeedback>
@@ -34,7 +34,7 @@ class ItemAddons extends Component {
           >
             <View style={touchableStyle}>
               <View>
-                <Icon name="alarm" size={21} color="#7b75f9" />
+                <Icon name="alarm" size={21} color="#58a9e0" />
               </View>
             </View>
           </TouchableNativeFeedback>
@@ -48,7 +48,7 @@ class ItemAddons extends Component {
                 background={TouchableNativeFeedback.SelectableBackground()}
               >
                 <View style={touchableStyle}>
-                    <Icon name="voice" size={21} color="#7b75f9" />
+                    <Icon name="voice" size={21} color="#58a9e0" />
                 </View>
               </TouchableNativeFeedback>
 
@@ -56,7 +56,7 @@ class ItemAddons extends Component {
               onPress={() => itemLocationStore.addLocation()}
             >
               <View style={touchableStyle}>
-                  <Icon name="makan" size={21} color="#7b75f9" />
+                  <Icon name="makan" size={21} color="#58a9e0" />
               </View>
             </TouchableNativeFeedback>
                 {renderAlarm()}
@@ -65,7 +65,7 @@ class ItemAddons extends Component {
               underlayColor="rgba(0,0,0,.026)"
             >
               <View style={touchableStyle}>
-                  <Icon name="link" size={21} color="#7b75f9" />
+                  <Icon name="link" size={21} color="#58a9e0" />
               </View>
             </TouchableNativeFeedback>
         </View>

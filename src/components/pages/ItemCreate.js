@@ -10,6 +10,7 @@ import { inject, observer } from 'mobx-react';
 import { BoxShadow } from 'react-native-shadow';
 import MapView, { Marker } from 'react-native-maps';
 import { Actions } from 'react-native-router-flux';
+import SplashScreen from 'react-native-splash-screen';
 import { Navigation, Icon } from '../common';
 import ItemAddons from '../elements/ItemAddons';
 import ItemForm from '../elements/ItemForm';
@@ -18,8 +19,9 @@ import RemoveModal from '../elements/modals/RemoveModal';
 import ImageModal from '../elements/modals/ImageModal';
 import MapModal from '../elements/modals/MapModal';
 import ReminderModal from '../elements/modals/ReminderModal';
+import SelectCatModal from '../elements/modals/SelectCatModal';
 
-@inject('itemStore', 'itemImageStore', 'itemVoiceStore', 'itemLocationStore')
+@inject('itemStore', 'itemImageStore', 'itemVoiceStore', 'itemLocationStore', 'categoryStore')
 @observer
 class ItemCreate extends Component {
   constructor(props) {
@@ -28,6 +30,9 @@ class ItemCreate extends Component {
   }
   componentWillMount() {
     this.props.itemStore.resetValues();
+  }
+  componentDidMount() {
+    SplashScreen.hide();
   }
   renderAllItems({ item }) {
     const { itemStore, itemImageStore, itemVoiceStore, itemLocationStore } = this.props;
@@ -126,21 +131,45 @@ class ItemCreate extends Component {
     const allItems = itemStore.images.concat(itemStore.voices, itemStore.map)
     .sort((a, b) => a.timestamp - b.timestamp);
     let saveButtonDisabled = true;
-    if (itemStore.title.length > 0) {
+    if (itemStore.title.length > 0 && itemStore.category) {
       saveButtonDisabled = false;
     }
+    const renderNav = () => {
+      if (this.props.categoryStore.userFirstEntered) {
+        return (
+          <Navigation
+            rightInfo="ذخیره"
+            rightInfoColor="#0288eb"
+            leftIcon="back"
+            onLeftButtonPress={() => {
+              itemStore.resetValues();
+              Actions.category({ type: 'replace' });
+              this.props.categoryStore.userFirstEntered = false;
+            }}
+            onRightButtonPress={() => {
+              itemStore.saveItemToDB(true);
+              this.props.categoryStore.userFirstEntered = false;
+            }}
+            rightButtonDisabled={saveButtonDisabled}
+          />
+        );
+      }
+      return (
+        <Navigation
+          rightInfo="ذخیره"
+          rightInfoColor="#0288eb"
+          leftIcon="back"
+          onLeftButtonPress={() => { itemStore.resetValues(); Actions.pop(); }}
+          onRightButtonPress={() => itemStore.saveItemToDB()}
+          rightButtonDisabled={saveButtonDisabled}
+        />
+      );
+    };
     return (
       <View style={{ flex: 1 }}>
 
         <View style={{ flex: 1, backgroundColor: 'white' }}>
-            <Navigation
-              rightInfo="ذخیره"
-              rightInfoColor="#0288eb"
-              leftIcon="back"
-              onLeftButtonPress={() => { itemStore.resetValues(); Actions.pop(); }}
-              onRightButtonPress={() => itemStore.saveItemToDB()}
-              rightButtonDisabled={saveButtonDisabled}
-            />
+            {renderNav()}
           <ScrollView>
             <ItemForm />
             <FlatList
@@ -157,6 +186,7 @@ class ItemCreate extends Component {
         <ImageModal />
         <MapModal />
         <ReminderModal />
+        <SelectCatModal />
       </View>
     );
   }

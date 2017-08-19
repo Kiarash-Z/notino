@@ -21,6 +21,7 @@ import RemoveModal from '../elements/modals/RemoveModal';
 import ImageModal from '../elements/modals/ImageModal';
 import MapModal from '../elements/modals/MapModal';
 import ReminderModal from '../elements/modals/ReminderModal';
+import SelectCatModal from '../elements/modals/SelectCatModal';
 
 @inject('itemStore', 'itemImageStore', 'itemVoiceStore', 'itemLocationStore')
 @observer
@@ -163,6 +164,10 @@ class ItemCreate extends Component {
     const { itemStore } = this.props;
     const allItems = itemStore.images.concat(itemStore.voices, itemStore.map)
     .sort((a, b) => a.timestamp - b.timestamp);
+    let saveButtonDisabled = true;
+    if (itemStore.title.length > 0 && itemStore.category) {
+      saveButtonDisabled = false;
+    }
     return (
       <View style={{ flex: 1 }}>
 
@@ -171,8 +176,9 @@ class ItemCreate extends Component {
               rightInfo="ذخیره"
               rightInfoColor="#0288eb"
               leftIcon="back"
-              onLeftButtonPress={() => { itemStore.resetValues(); Actions.pop(); }}
+              onLeftButtonPress={() => { Actions.pop(); }}
               onRightButtonPress={() => itemStore.editItemFromDB()}
+              rightButtonDisabled={saveButtonDisabled}
             />
           <ScrollView>
             <ItemForm item={this.props.item} />
@@ -190,6 +196,7 @@ class ItemCreate extends Component {
         <ImageModal />
         <MapModal />
         <ReminderModal />
+        <SelectCatModal />
       </View>
     );
   }

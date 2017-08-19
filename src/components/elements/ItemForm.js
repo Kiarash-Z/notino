@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
-import { View, Picker } from 'react-native';
+import { View, TouchableNativeFeedback, Text } from 'react-native';
 import { inject, observer } from 'mobx-react';
-import { ItemSection, Input } from '../common';
+import { ItemSection, Input, Icon } from '../common';
 import categoryDB from '../../database/categoryDB';
 
 @inject('itemStore')
 @observer
 class ItemForm extends Component {
-  componentWillMount() {
+  componentDidMount() {
     const active = categoryDB.objects('Category').find(cat => cat.active);
     if (active.type !== 'همه') {
       this.props.itemStore.updateValue({ prop: 'category', value: active.type });
@@ -15,16 +15,46 @@ class ItemForm extends Component {
   }
   render() {
     const { itemStore } = this.props;
-    const { title, shortDescription, category, link } = itemStore;
-    const { sectionStyle } = styles;
-    const renderPicker = () => {
-      return categoryDB.objects('Category')
-      .filter((item) => (item.type !== 'همه') && (item.type !== 'ایجاد دسته'))
-      .map((item, index) => {
+    const { title, description, category, link } = itemStore;
+    const { sectionStyle, categorySelectTextStyle, catContainerStyle } = styles;
+    const renderSelectCat = () => {
+      if (categoryDB.objects('Category').length > 2) {
+        if (itemStore.category) {
+          const thisCat = categoryDB.objects('Category')
+          .find(cat => cat.type === itemStore.category);
           return (
-            <Picker.Item label={item.type} value={item.type} key={index} />
+            <TouchableNativeFeedback onPress={() => { itemStore.showSelectCatModal = true; }}>
+              <View
+                style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between' }}
+              >
+                <Icon name="left-arrow" color="rgba(0,0,0,.7)" size={17} />
+                <View style={catContainerStyle}>
+                  <Text style={categorySelectTextStyle}>{itemStore.category}</Text>
+                  <Icon name={thisCat.icon} size={19} color={thisCat.color} />
+                </View>
+              </View>
+            </TouchableNativeFeedback>
           );
-      });
+        }
+        return (
+          <TouchableNativeFeedback onPress={() => { itemStore.showSelectCatModal = true; }}>
+            <View style={catContainerStyle}>
+              <Text style={[categorySelectTextStyle, { color: 'rgba(0,0,0,.3)' }]}>
+                انتخاب دسته بندی
+              </Text>
+              <Icon name="down-arrow" size={17} color="black" />
+            </View>
+          </TouchableNativeFeedback>
+        );
+      }
+      return (
+        <Text style={[categorySelectTextStyle, { color: 'rgba(0,0,0,.3)' }]}>
+          لطفا یک دسته بندی درست کنید!
+        </Text>
+      );
     };
     return (
       <View style={{ paddingRight: 10 }}>
@@ -41,24 +71,24 @@ class ItemForm extends Component {
         </ItemSection>
 
         <ItemSection style={sectionStyle}>
-          <Input
-            align="right"
-            placeholder="توضیح کوتاه"
-            bordered
-            value={shortDescription}
-            size={15}
-            maxLength={35}
-            onChangeText={value => itemStore.updateValue({ prop: 'shortDescription', value })}
-          />
+          <View>
+            <Input
+              align="right"
+              style={{ flex: 1 }}
+              placeholder="توضیح"
+              bordered
+              value={description}
+              size={15}
+              multiline
+              numberOfLines={6}
+              maxLength={320}
+              onChangeText={value => itemStore.updateValue({ prop: 'description', value })}
+            />
+          </View>
         </ItemSection>
 
         <ItemSection style={sectionStyle}>
-          <Picker
-          selectedValue={category}
-          onValueChange={value => itemStore.updateValue({ prop: 'category', value })}
-          >
-            {renderPicker()}
-          </Picker>
+          {renderSelectCat()}
         </ItemSection>
 
         <ItemSection style={sectionStyle}>
@@ -81,6 +111,19 @@ const styles = {
     paddingTop: 4,
     paddingBottom: 4,
     borderTopColor: 'rgba(0,0,0,.07)',
+  },
+  categorySelectTextStyle: {
+    fontFamily: 'IS_Light',
+    fontSize: 15,
+    textAlign: 'right',
+    paddingTop: 10,
+    paddingBottom: 10,
+    marginRight: 10
+  },
+  catContainerStyle: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center'
   }
 };
 

@@ -21,6 +21,7 @@ class Category {
   @observable activeIcon = 'musiqi';
   @observable showCatRemoveModal = false;
   @observable categoryRemove = null;
+  @observable userFirstEntered = true;
 
   resetCreateValues() {
     this.showCreateModal = false;
@@ -46,7 +47,7 @@ class Category {
       if (duplacationCheck) {
         return false;
       }
-      return item.shortDescription.includes(text);
+      return item.description.includes(text);
     });
     this.filteredItems = titleFiltered.concat(descriptionFiltered);
   }
@@ -115,6 +116,23 @@ class Category {
           color: '#34495e',
           active: false,
           changable: true
+        });
+
+        // descriptionInputHeight
+        categoryDB.create('Item', {
+          title: 'درباره ما',
+          description: 'با نوتینو بروز بنویس :)\nتوسعه دهنده: کیارش زرین مهر\nطراح لوگو: امیر نجفی\n تلگرام: Kiarash_Z@',
+          id: '0',
+          category: 'کار',
+          link: 'kiarash.zar@gmail.com',
+          images: [],
+          reminderSetted: false,
+          reminderDate: JSON.stringify(''),
+          map: JSON.stringify([]),
+          voices: [],
+          fileTypes: [categoryDB.create('primitiveStr', {
+            value: 'link'
+          })]
         });
       });
     }

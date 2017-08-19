@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, FlatList } from 'react-native';
 import { inject, observer } from 'mobx-react';
 import { Actions } from 'react-native-router-flux';
+import SplashScreen from 'react-native-splash-screen';
 import { Navigation } from '../common/Navigation';
 import CategoriesItem from '../elements/CategoriesItem';
 import categoryDB from '../../database/categoryDB';
@@ -12,6 +13,7 @@ import RemoveCatModal from '../elements/modals/RemoveCatModal';
 @observer
 class Categories extends Component {
   componentDidMount() {
+    SplashScreen.hide();
     categoryDB.addListener('change', () => this.forceUpdate());
   }
   componentWillUnmount() {
